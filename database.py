@@ -2,11 +2,17 @@
 
 import MySQLdb
 
+# Global variable to store the database object
+globalDB = 0
+
 def connectToDB(host, username, password, databaseName):
-	""" Return the database object """
+	""" Return the database cursor object """
+	global globalDB
 	try:
 		db = MySQLdb.connect(host, username, password, databaseName)
-		return db
+		dbCursor = db.cursor()
+		globalDB = db
+		return dbCursor
 	except:
 		print "Error connecting to database with the following parameters:"
 		print "Host: %s" % host
@@ -72,3 +78,18 @@ def addTransactionDetails(dbCursor, donorID, amount, date):
 		return True
 	except:
 		return False
+
+def closeDBConnection():
+	""" Close the database connection using the global variable """
+	global globalDB
+	if globalDB == 0:
+		print "No database connection yet..."
+		return False
+	try:
+		cursor = globalDB.cursor()
+		cursor.execute("Select * from Individuals")
+		data = cursor.fetchall()
+		print data
+		globalDB.close()
+	except:
+		print "ERROR in closing the database..."
