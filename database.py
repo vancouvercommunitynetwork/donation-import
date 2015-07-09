@@ -54,3 +54,11 @@ def getDonorID(dbCursor, firstName, lastName, address):
 		# no match at all for last name
 		else:
 			return False
+
+def createDonor(dbCursor, firstName, lastName, address, city, province, postalCode):
+	""" Returns the ID number of the created Donor """
+	sql = "INSERT INTO Individuals(`First Name`, `Last Name`, `Street Address`, \
+			`City`, `Province`, `Postal Code`) VALUES ('%s','%s','%s','%s','%s','%s');" \
+			% (firstName, lastName, address, city, province, postalCode)
+	dbCursor.execute(sql)
+	return getDonorID(dbCursor, firstName, lastName, address)
