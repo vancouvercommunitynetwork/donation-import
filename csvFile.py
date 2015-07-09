@@ -39,8 +39,3 @@ def getRecords(csvObject):
       csvRecords.append(CSVRecord(row))
    del csvRecords[0] #Delete the first row containing the row labels
    return csvRecords
-   
-# sample program
-csvObject = openCsvFile("CharityDataDownload.csv")
-csvRecords = getRecords(csvObject)
-print csvRecords[1].firstName
