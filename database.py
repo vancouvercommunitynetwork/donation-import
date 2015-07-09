@@ -62,3 +62,13 @@ def createDonor(dbCursor, firstName, lastName, address, city, province, postalCo
 			% (firstName, lastName, address, city, province, postalCode)
 	dbCursor.execute(sql)
 	return getDonorID(dbCursor, firstName, lastName, address)
+
+def addTransactionDetails(dbCursor, donorID, amount, date):
+	""" Add the transaction details to the Money_Brought_In table """
+	sql = "INSERT INTO Money_Brought_In(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) \
+			VALUES ('%s', %d, '%s', '%s', %d);" % (donorID, amount, date, "Donation", 0)
+	try:
+		dbCursor.execute(sql)
+		return True
+	except:
+		return False
