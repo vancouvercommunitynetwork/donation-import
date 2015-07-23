@@ -3,14 +3,9 @@
 import database
 import csvFile
 
-HOST = "localhost"
-USERNAME = "root"
-PASSWORD = ""
-DATABASE = "Test"
-CSV_FILENAME = "CharityDataDownload.csv"
-
 def changeCSVToDatabaseFormat(csvRecord):
 	""" Change the CSV format to a more suitable format for database addition """
+
 	donorInfo = database.DonorInfo()
 	donorInfo.firstName = csvRecord.firstName
 	donorInfo.lastName = csvRecord.lastName
@@ -20,21 +15,26 @@ def changeCSVToDatabaseFormat(csvRecord):
 	donorInfo.postalCode = csvRecord.postalCode
 	donorInfo.amountPaid = int(csvRecord.amountPaid)
 	donorInfo.datePaid = csvRecord.datePaid
+
 	return donorInfo
 
-
 # Main method
-def executeAddTransaction(csvFileName):
-	csvObject = csvFile.openCsvFile("CharityDataDownload.csv")
-	csvRecords = csvFile.getRecords(csvObject)
+def executeAddTransaction(csvFileName, dbInfo):
 
-	database.connectToDB(HOST, USERNAME, PASSWORD, DATABASE)
+	csvObject = csvFile.openCsvFile(csvFileName)
+	if csvObject == False:
+		return False
+	csvRecords = csvFile.getRecords(csvObject)
 
 	for csvRecord in csvRecords:
 		donorInfo = changeCSVToDatabaseFormat(csvRecord)
-		database.addTransactionToDatabase(donorInfo)
-
-	database.closeDBConnection()
+		database.addTransactionToDatabase(donorInfo, dbInfo)
 
 # Call the main command
-executeAddTransaction(CSV_FILENAME)
+raw_host = raw_input("Input the host name of the database (e.g. <IP Address of the server>): ")
+raw_user = raw_input("Input the username of the database (e.g. root): ")
+raw_pass = raw_input("Input the password of the database: ")
+raw_dbname = raw_input("Input the database name: ")
+raw_csvFilename = raw_input("Input the CSV file name (Include the file extension): ")
+databaseInfo = database.DatabaseInfo(raw_host,raw_user,raw_pass,raw_dbname)
+executeAddTransaction(raw_csvFilename, databaseInfo)

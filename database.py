@@ -4,6 +4,8 @@ import MySQLdb
 
 # Global variable to store the database object
 globalDB = 0
+DONORINFO_TABLE = "Individuals"
+TRANSACTION_TABLE = "Money_Brought_In"
 
 class DonorInfo:
    """ Class for a donor information """
@@ -16,17 +18,30 @@ class DonorInfo:
       self.postalCode = ""
       self.amountPaid = 0
       self.datePaid = '0000-00-00 00:00:00'
+class DatabaseInfo:
+	""" Class for the database information """
+	def __init__(self, host, username, password, databaseName):
+		self.host = host
+		self.username = username
+		self.password = password
+		self.databaseName = databaseName
 
 # Private
 def getDonorID(donorInfo):
-	""" Return the ID# of the donor if the account exists already """
+	""" Return the ID# of the donor if the account exists already 
+	- Matching is done by checking if the last and first name and address
+	matches the information from the database. If not, the program will
+	output all of the donors that matches the last name. The user will
+	then be prompted to select which of the donor he/she chooses to use
+	for the transaction.
+	"""
 	global globalDB
 	if globalDB == 0:
 		print "No database connection yet..."
 		return False
 
 	dbCursor = globalDB.cursor()
-	sql = "SELECT `ID #` FROM Individuals WHERE `Last Name` = '%s' AND \
+	sql = "SELECT `ID #` FROM " + DONORINFO_TABLE + " WHERE `Last Name` = '%s' AND \
 			`First Name` = '%s' AND `Street Address` = '%s';" % (donorInfo.lastName, donorInfo.firstName, donorInfo.address)
 	getResult = dbCursor.execute(sql)
 
@@ -37,7 +52,7 @@ def getDonorID(donorInfo):
 	
 	else: # multiple match or no match
 		sql = "SELECT `ID #`, `Last Name`, `First Name`, `Street Address` \
-				FROM Individuals WHERE `Last Name` = '%s'" % (donorInfo.lastName)
+				FROM " + DONORINFO_TABLE + " WHERE `Last Name` = '%s'" % (donorInfo.lastName)
 		getResult = dbCursor.execute(sql)
 
 		# with multiple matches, display results so user can select the right account
@@ -49,11 +64,9 @@ def getDonorID(donorInfo):
 				print "%d. %s, %s, %s"%(counter, row[1], row[2], row[3])
 				counter += 1
 			print "Details from CSV file: \n %s, %s, %s" % (donorInfo.lastName, donorInfo.firstName, donorInfo.address)
-			#raw_choice = raw_input("Input your choice (0 if none of the above): ")
-			# stub - start (sublime text does not accept input)
-			print "Input your choice (0 if none of the above): 2"
-			raw_choice = 0
-			# stub - end
+
+			raw_choice = raw_input("Input your choice (0 if none of the above): ")
+			
 			if raw_choice > 0:
 				return data[raw_choice - 1][0]
 			else:
@@ -71,7 +84,7 @@ def createDonor(donorInfo):
 		return False
 
 	dbCursor = globalDB.cursor()
-	sql = "INSERT INTO Individuals(`First Name`, `Last Name`, `Street Address`, \
+	sql = "INSERT INTO " + DONORINFO_TABLE + "(`First Name`, `Last Name`, `Street Address`, \
 			`City`, `Province`, `Postal Code`) VALUES ('%s','%s','%s','%s','%s','%s');" \
 			% (donorInfo.firstName, donorInfo.lastName, donorInfo.address, \
 			donorInfo.city, donorInfo.province, donorInfo.postalCode)
@@ -85,43 +98,27 @@ def addTransactionDetails(donorID, donorInfo):
 		return False
 
 	dbCursor = globalDB.cursor()
-	sql = "INSERT INTO Money_Brought_In(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) \
+	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) \
 			VALUES ('%s', %d, '%s', '%s', %d);" % (donorID, donorInfo.amountPaid, donorInfo.datePaid, "Donation", 0)
 	try:
 		dbCursor.execute(sql)
 		return True
 	except:
 		return False
-
-# MAIN APIs
-def connectToDB(host, username, password, databaseName):
+def connectToDB(dbInfo):
 	""" Return the database cursor object """
 	global globalDB
 	try:
-		db = MySQLdb.connect(host, username, password, databaseName)
+		db = MySQLdb.connect(dbInfo.host, dbInfo.username, dbInfo.password, dbInfo.databaseName)
 		dbCursor = db.cursor()
 		globalDB = db
 		return dbCursor
 	except:
 		print "Error connecting to database with the following parameters:"
-		print "Host: %s" % host
-		print "Username: %s" % username
-		print "Database name: %s" % databaseName
+		print "Host: %s" % dbInfo.host
+		print "Username: %s" % dbInfo.username
+		print "Database name: %s" % dbInfo.databaseName
 		return False
-	return False
-def addTransactionToDatabase(donorDetails):
-	global globalDB
-	if globalDB == 0:
-		print "No database connection yet..."
-		return False
-	donorID = getDonorID(donorDetails)
-	if donorID == False:
-		donorID = createDonor(donorDetails)
-	if addTransactionDetails(donorID, donorDetails) == True:
-		print "Successful in adding transaction..."
-		return True
-	else:
-		print "Error in adding transaction for %s %s" % (donorDetails.firstName, donorDetails.lastName)
 	return False
 def closeDBConnection():
 	""" Close the database connection using the global variable """
@@ -132,5 +129,30 @@ def closeDBConnection():
 	try:
 		cursor = globalDB.cursor()
 		globalDB.close()
+		globalDb = 0
 	except:
-		print "ERROR in closing the database..."
+		print "ERROR in closing the database..."	
+
+# MAIN APIs
+def addTransactionToDatabase(donorDetails,dbInfo):
+	connectToDB(dbInfo)
+	
+	global globalDB
+	if globalDB == 0:
+		print "No database connection yet..."
+		return False
+
+	donorID = getDonorID(donorDetails)
+
+	if donorID == False:
+		donorID = createDonor(donorDetails)
+
+	if addTransactionDetails(donorID, donorDetails) == True:
+		print "Successful in adding transaction..."
+		closeDBConnection()
+		return True
+	else:
+		print "Error in adding transaction for %s %s" % (donorDetails.firstName, donorDetails.lastName)
+
+	closeDBConnection()
+	return False

@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # CSV file related functions
 
 import csv
@@ -26,12 +27,19 @@ class CSVRecord:
       self.amountPaid = infoRow[__CSV_AMOUNT_PAID__]
       self.datePaid = infoRow[__CSV_DATE_PAID__]
 
+# Main APIs
 def openCsvFile(filename):
    """ Return the CSV file as an iterator object """
-   csvFile = open(filename, 'rb')
-   csvOutput = csv.reader(csvFile, delimiter=__CSV_DELIMETER__)
-   return csvOutput
 
+   try:
+      csvFile = open(filename, 'rb')
+   except IOError:
+      print "Error in opening/reading CSV file. Check if file exists..."
+      return False
+
+   csvOutput = csv.reader(csvFile, delimiter=__CSV_DELIMETER__)
+   
+   return csvOutput
 def getRecords(csvObject):
    """ Return the list of records found inside the CSV file """
    csvRecords = []
