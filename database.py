@@ -49,7 +49,10 @@ def getDonorID(donorInfo):
 		#return ID number
 		data = dbCursor.fetchone()
 		return data[0]
-	
+	else:
+		return False
+	"""
+	# This algorithm is to display all matching last name and will let the user input a choice
 	else: # multiple match or no match
 		sql = "SELECT `ID #`, `Last Name`, `First Name`, `Street Address` \
 				FROM " + DONORINFO_TABLE + " WHERE `Last Name` = '%s'" % (donorInfo.lastName)
@@ -76,6 +79,7 @@ def getDonorID(donorInfo):
 		# no match at all for last name
 		else:
 			return False
+	"""
 def createDonor(donorInfo):
 	""" Returns the ID number of the created Donor """
 	global globalDB
