@@ -27,7 +27,7 @@ class DatabaseInfo:
 		self.databaseName = databaseName
 
 # Private
-def getDonorID(donorInfo):
+def __getDonorID(donorInfo):
 	""" Return the ID# of the donor if the account exists already 
 	- Matching is done by checking if the last and first name and address
 	matches the information from the database. If not, the program will
@@ -80,7 +80,7 @@ def getDonorID(donorInfo):
 		else:
 			return False
 	"""
-def createDonor(donorInfo):
+def __createDonor(donorInfo):
 	""" Returns the ID number of the created Donor """
 	global globalDB
 	if globalDB == 0:
@@ -93,8 +93,8 @@ def createDonor(donorInfo):
 			% (donorInfo.firstName, donorInfo.lastName, donorInfo.address, \
 			donorInfo.city, donorInfo.province, donorInfo.postalCode)
 	dbCursor.execute(sql)
-	return getDonorID(donorInfo)
-def addTransactionDetails(donorID, donorInfo):
+	return __getDonorID(donorInfo)
+def __addTransactionDetails(donorID, donorInfo):
 	""" Add the transaction details to the Money_Brought_In table """
 	global globalDB
 	if globalDB == 0:
@@ -109,7 +109,7 @@ def addTransactionDetails(donorID, donorInfo):
 		return True
 	except:
 		return False
-def connectToDB(dbInfo):
+def __connectToDB(dbInfo):
 	""" Return the database cursor object """
 	global globalDB
 	try:
@@ -124,7 +124,7 @@ def connectToDB(dbInfo):
 		print "Database name: %s" % dbInfo.databaseName
 		return False
 	return False
-def closeDBConnection():
+def __closeDBConnection():
 	""" Close the database connection using the global variable """
 	global globalDB
 	if globalDB == 0:
@@ -139,24 +139,24 @@ def closeDBConnection():
 
 # MAIN APIs
 def addTransactionToDatabase(donorDetails,dbInfo):
-	connectToDB(dbInfo)
+	__connectToDB(dbInfo)
 	
 	global globalDB
 	if globalDB == 0:
 		print "No database connection yet..."
 		return False
 
-	donorID = getDonorID(donorDetails)
+	donorID = __getDonorID(donorDetails)
 
 	if donorID == False:
-		donorID = createDonor(donorDetails)
+		donorID = __createDonor(donorDetails)
 
-	if addTransactionDetails(donorID, donorDetails) == True:
+	if __addTransactionDetails(donorID, donorDetails) == True:
 		print "Successful in adding transaction..."
-		closeDBConnection()
+		__closeDBConnection()
 		return True
 	else:
 		print "Error in adding transaction for %s %s" % (donorDetails.firstName, donorDetails.lastName)
 
-	closeDBConnection()
+	__closeDBConnection()
 	return False
