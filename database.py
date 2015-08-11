@@ -41,9 +41,9 @@ def __getDonorID(donorInfo):
 		return False
 
 	dbCursor = globalDB.cursor()
-	sql = "SELECT `ID #` FROM " + DONORINFO_TABLE + " WHERE `Last Name` = '%s' AND \
-			`First Name` = '%s' AND `Street Address` = '%s';" % (donorInfo.lastName, donorInfo.firstName, donorInfo.address)
-	getResult = dbCursor.execute(sql)
+	sql = "SELECT `ID #` FROM " + DONORINFO_TABLE + " WHERE `Last Name` = %s AND " + \
+			"`First Name` = %s AND `Street Address` = %s;"
+	getResult = dbCursor.execute(sql,(donorInfo.lastName, donorInfo.firstName, donorInfo.address))
 
 	if getResult == 1: # exact match
 		#return ID number
@@ -54,9 +54,9 @@ def __getDonorID(donorInfo):
 	"""
 	# This algorithm is to display all matching last name and will let the user input a choice
 	else: # multiple match or no match
-		sql = "SELECT `ID #`, `Last Name`, `First Name`, `Street Address` \
-				FROM " + DONORINFO_TABLE + " WHERE `Last Name` = '%s'" % (donorInfo.lastName)
-		getResult = dbCursor.execute(sql)
+		sql = "SELECT `ID #`, `Last Name`, `First Name`, `Street Address` " + \
+				"FROM " + DONORINFO_TABLE + " WHERE `Last Name` = %s"
+		getResult = dbCursor.execute(sql, (donorInfo.lastName))
 
 		# with multiple matches, display results so user can select the right account
 		if getResult > 0:
@@ -80,6 +80,7 @@ def __getDonorID(donorInfo):
 		else:
 			return False
 	"""
+
 def __createDonor(donorInfo):
 	""" Returns the ID number of the created Donor """
 	global globalDB
@@ -88,12 +89,12 @@ def __createDonor(donorInfo):
 		return False
 
 	dbCursor = globalDB.cursor()
-	sql = "INSERT INTO " + DONORINFO_TABLE + "(`First Name`, `Last Name`, `Street Address`, \
-			`City`, `Province`, `Postal Code`) VALUES ('%s','%s','%s','%s','%s','%s');" \
-			% (donorInfo.firstName, donorInfo.lastName, donorInfo.address, \
-			donorInfo.city, donorInfo.province, donorInfo.postalCode)
-	dbCursor.execute(sql)
+	sql = "INSERT INTO " + DONORINFO_TABLE + "(`First Name`, `Last Name`, `Street Address`, " + \
+			"`City`, `Province`, `Postal Code`) VALUES (%s, %s, %s, %s, %s, %s);"
+	dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
+
 	return __getDonorID(donorInfo)
+
 def __addTransactionDetails(donorID, donorInfo):
 	""" Add the transaction details to the Money_Brought_In table """
 	global globalDB
@@ -102,13 +103,14 @@ def __addTransactionDetails(donorID, donorInfo):
 		return False
 
 	dbCursor = globalDB.cursor()
-	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) \
-			VALUES ('%s', %d, '%s', '%s', %d);" % (donorID, donorInfo.amountPaid, donorInfo.datePaid, "Donation", 0)
+	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) " + \
+			"VALUES (%s, %s, %s, 'Donation', 0);"
 	try:
-		dbCursor.execute(sql)
+		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
 		return True
 	except:
 		return False
+
 def __connectToDB(dbInfo):
 	""" Return the database cursor object """
 	global globalDB
@@ -124,6 +126,7 @@ def __connectToDB(dbInfo):
 		print "Database name: %s" % dbInfo.databaseName
 		return False
 	return False
+
 def __closeDBConnection():
 	""" Close the database connection using the global variable """
 	global globalDB
