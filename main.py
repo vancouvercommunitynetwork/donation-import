@@ -14,7 +14,7 @@ def changeCSVToDatabaseFormat(csvRecord):
 	donorInfo.city = csvRecord.city
 	donorInfo.province = csvRecord.province
 	donorInfo.postalCode = csvRecord.postalCode
-	donorInfo.amountPaid = int(csvRecord.amountPaid)
+	donorInfo.amountPaid = float(csvRecord.amountPaid)
 	donorInfo.datePaid = csvRecord.datePaid
 
 	return donorInfo
