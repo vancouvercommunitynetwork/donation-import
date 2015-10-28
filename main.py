@@ -5,10 +5,10 @@ import csvFile
 import getpass
 
 DEFAULT_HOST 		= "localhost"
-DEFAULT_USER 		= "ralph"
+DEFAULT_USER 		= "root"
 #stub-start
 #erase this!
-DEFAULT_PASS 		= "helloWorld_1!"
+DEFAULT_PASS 		= "vcnpassword"
 #stub-end
 DEFAULT_DBNAME 		= "Money"
 DEFAULT_CSVFILENAME = "CharityDataDownload.csv"

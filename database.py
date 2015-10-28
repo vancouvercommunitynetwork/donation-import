@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+from __future__ import print_function
+
 import MySQLdb
 
 # Global variable to store the database object
@@ -37,7 +39,7 @@ def __getDonorID(donorInfo):
 	"""
 	global globalDB
 	if globalDB == 0:
-		print "No database connection yet..."
+		print ("No database connection yet")
 		return False
 
 	dbCursor = globalDB.cursor()
@@ -62,11 +64,11 @@ def __getDonorID(donorInfo):
 		if getResult > 0:
 			data = dbCursor.fetchall()
 			counter = 1
-			print "#. Last Name, First Name, Address"
+			print ("#. Last Name, First Name, Address")
 			for row in data:
 				print "%d. %s, %s, %s"%(counter, row[1], row[2], row[3])
 				counter += 1
-			print "Details from CSV file: \n %s, %s, %s" % (donorInfo.lastName, donorInfo.firstName, donorInfo.address)
+			print ("Details from CSV file: \n %s, %s, %s" % (donorInfo.lastName, donorInfo.firstName, donorInfo.address))
 
 			raw_choice = raw_input("Input your choice (0 if none of the above): ")
 			
@@ -85,7 +87,7 @@ def __createDonor(donorInfo):
 	""" Returns the ID number of the created Donor """
 	global globalDB
 	if globalDB == 0:
-		print "No database connection yet..."
+		print ("No database connection yet...")
 		return False
 
 	dbCursor = globalDB.cursor()
@@ -99,16 +101,20 @@ def __addTransactionDetails(donorID, donorInfo):
 	""" Add the transaction details to the Money_Brought_In table """
 	global globalDB
 	if globalDB == 0:
-		print "No database connection yet..."
+		print ("No database connection yet...")
 		return False
 
 	dbCursor = globalDB.cursor()
+	# % signs in the STR_TO_DATE function must be escaped using %%, and quotes mu be escaped using \' 
 	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) " + \
-			"VALUES (%s, %s, %s, 'Donation', 0);"
+			"VALUES (%s, %s, STR_TO_DATE(%s,\'%%m/%%d/%%Y\'), 'Donation', 0);"
+	print("Query is: %s",sql)
+	print("Date is "+donorInfo.datePaid)
 	try:
 		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
 		return True
-	except:
+	except MySQLdb.Error, e:
+		print ("Error %d: %s", e.args[0], e.args[1])
 		return False
 
 def __connectToDB(dbInfo):
@@ -120,10 +126,10 @@ def __connectToDB(dbInfo):
 		globalDB = db
 		return dbCursor
 	except:
-		print "Error connecting to database with the following parameters:"
-		print "Host: %s" % dbInfo.host
-		print "Username: %s" % dbInfo.username
-		print "Database name: %s" % dbInfo.databaseName
+		print ("Error connecting to database with the following parameters:")
+		print ("Host: %s" % dbInfo.host)
+		print ("Username: %s" % dbInfo.username)
+		print ("Database name: %s" % dbInfo.databaseName)
 		return False
 	return False
 
@@ -131,14 +137,14 @@ def __closeDBConnection():
 	""" Close the database connection using the global variable """
 	global globalDB
 	if globalDB == 0:
-		print "No database connection yet..."
+		print ("No database connection yet...")
 		return False
 	try:
 		cursor = globalDB.cursor()
 		globalDB.close()
 		globalDb = 0
 	except:
-		print "ERROR in closing the database..."	
+		print ("ERROR in closing the database...")
 
 # MAIN APIs
 def addTransactionToDatabase(donorDetails,dbInfo):
@@ -146,7 +152,7 @@ def addTransactionToDatabase(donorDetails,dbInfo):
 	
 	global globalDB
 	if globalDB == 0:
-		print "No database connection yet..."
+		print ("No database connection yet...")
 		return False
 
 	donorID = __getDonorID(donorDetails)
@@ -155,11 +161,11 @@ def addTransactionToDatabase(donorDetails,dbInfo):
 		donorID = __createDonor(donorDetails)
 
 	if __addTransactionDetails(donorID, donorDetails) == True:
-		print "Successful in adding transaction..."
+		print ("Successful in adding transaction...")
 		__closeDBConnection()
 		return True
 	else:
-		print "Error in adding transaction for %s %s" % (donorDetails.firstName, donorDetails.lastName)
+		print ("Error in adding transaction for %s %s" % (donorDetails.firstName, donorDetails.lastName))
 
 	__closeDBConnection()
 	return False
