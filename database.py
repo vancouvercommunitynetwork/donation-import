@@ -91,9 +91,12 @@ def __createDonor(donorInfo):
 	dbCursor = globalDB.cursor()
 	sql = "INSERT INTO " + DONORINFO_TABLE + "(`First Name`, `Last Name`, `Street Address`, " + \
 			"`City`, `Province`, `Postal Code`) VALUES (%s, %s, %s, %s, %s, %s);"
-	dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
 
-	return __getDonorID(donorInfo)
+        try:
+        	dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
+	       return __getDonorID(donorInfo)
+        except:
+               return false
 
 def __addTransactionDetails(donorID, donorInfo):
 	""" Add the transaction details to the Money_Brought_In table """
