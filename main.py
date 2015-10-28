@@ -3,6 +3,8 @@
 import database
 import csvFile
 import getpass
+# import of module to parse configuration files
+# note that the module name will change  to configparser for Python3
 import ConfigParser
 
 CONFIGURATION_FILE	= "donation_import.cfg"
