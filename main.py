@@ -3,15 +3,35 @@
 import database
 import csvFile
 import getpass
+import ConfigParser
 
+CONFIGURATION_FILE	= "donation_import.cfg"
 DEFAULT_HOST 		= "localhost"
 DEFAULT_USER 		= "root"
 #stub-start
 #erase this!
-DEFAULT_PASS 		= "vcnpassword"
+DEFAULT_PASS 		= "password"
 #stub-end
-DEFAULT_DBNAME 		= "Money"
+DEFAULT_DBNAME 		= "DatabaseName"
 DEFAULT_CSVFILENAME = "CharityDataDownload.csv"
+
+def readConfigurationFile(file):
+	"""Reads database and csv file parameters from a given file """
+	databaseSectionName = 'database';
+	config = ConfigParser.ConfigParser()
+	config.read('donation_import.cfg')
+	host = config.get(databaseSectionName,'host')
+	userName = config.get(databaseSectionName,'userName')
+	password = config.get(databaseSectionName,'password')
+	dbName = config.get(databaseSectionName,'dbName')
+
+	csvFileName = config.get('csvFile','csvFileName')
+
+	# Following line is only used for debugging
+	#print(",".join((host,userName,password,dbName,csvFileName)))
+
+	return (host,userName,password,dbName,csvFileName)
+
 
 def changeCSVToDatabaseFormat(csvRecord):
 	""" Change the CSV format to a more suitable format for database addition """
@@ -28,7 +48,8 @@ def changeCSVToDatabaseFormat(csvRecord):
 
 	return donorInfo
 
-# Main method
+
+# Main function 
 def executeAddTransaction(csvFileName, dbInfo):
 
 	csvObject = csvFile.openCsvFile(csvFileName)
@@ -40,24 +61,11 @@ def executeAddTransaction(csvFileName, dbInfo):
 		donorInfo = changeCSVToDatabaseFormat(csvRecord)
 		database.addTransactionToDatabase(donorInfo, dbInfo)
 
-# Call the main command
-raw_host = raw_input("Input the host name of the database (e.g. <IP Address of the server>): ")
-raw_user = raw_input("Input the username of the database (e.g. root): ")
-raw_pass = getpass.getpass("Input the password of the database: ")
-raw_dbname = raw_input("Input the database name: ")
-raw_csvFilename = raw_input("Input the CSV file name (Include the file extension): ")
 
-#Default Input of values
-if raw_host == "":
-	raw_host = DEFAULT_HOST
-if raw_user == "":
-	raw_user = DEFAULT_USER
-if raw_pass == "":
-	raw_pass = DEFAULT_PASS
-if raw_dbname == "":
-	raw_dbname = DEFAULT_DBNAME
-if raw_csvFilename == "":
-	raw_csvFilename = DEFAULT_CSVFILENAME
+# Call the main command
+
+(raw_host,raw_user,raw_pass,raw_dbname,raw_csvFilename) = readConfigurationFile(CONFIGURATION_FILE)
 
 databaseInfo = database.DatabaseInfo(raw_host,raw_user,raw_pass,raw_dbname)
+
 executeAddTransaction(raw_csvFilename, databaseInfo)
