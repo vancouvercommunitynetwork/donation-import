@@ -108,8 +108,11 @@ def __addTransactionDetails(donorID, donorInfo):
 	# % signs in the STR_TO_DATE function must be escaped using %%, and quotes mu be escaped using \' 
 	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) " + \
 			"VALUES (%s, %s, STR_TO_DATE(%s,\'%%m/%%d/%%Y\'), 'Donation', 0);"
-	print("Query is: %s",sql)
-	print("Date is "+donorInfo.datePaid)
+	
+	# Following lines used for debugging
+	#print("Query is: %s",sql)
+	#print("Date is "+donorInfo.datePaid)
+
 	try:
 		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
 		return True
