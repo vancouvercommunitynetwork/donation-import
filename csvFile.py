@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # CSV file related functions
 
+from __future__ import print_function
+
 import csv
 
 # CONSTANTS
@@ -34,7 +36,7 @@ def openCsvFile(filename):
    try:
       csvFile = open(filename, 'rb')
    except IOError:
-      print "Error in opening/reading CSV file. Check if file exists..."
+      print ("Error in opening/reading CSV file. Check if file exists...")
       return False
 
    csvOutput = csv.reader(csvFile, delimiter=__CSV_DELIMETER__)
