@@ -98,7 +98,7 @@ def __createDonor(donorInfo):
         	dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
 	       return __getDonorID(donorInfo)
         except:
-               return false
+               return False
 
 def __addTransactionDetails(donorID, donorInfo):
 	""" Add the transaction details to the Money_Brought_In table """
