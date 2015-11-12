@@ -28,11 +28,12 @@ def readConfigurationFile(file):
 	dbName = config.get(databaseSectionName,'dbName')
 
 	csvFileName = config.get('csvFile','csvFileName')
+        csvErrorFileName = config.get('csvFile','csvErrorFileName')
 
 	# Following line is only used for debugging
 	#print(",".join((host,userName,password,dbName,csvFileName)))
 
-	return (host,userName,password,dbName,csvFileName)
+	return (host,userName,password,dbName,csvFileName,csvErrorFileName)
 
 
 def changeCSVToDatabaseFormat(csvRecord):
@@ -66,7 +67,7 @@ def executeAddTransaction(csvFileName, dbInfo):
 
 # Call the main command
 
-(raw_host,raw_user,raw_pass,raw_dbname,raw_csvFilename) = readConfigurationFile(CONFIGURATION_FILE)
+(raw_host,raw_user,raw_pass,raw_dbname,raw_csvFilename,csvErrorFileName) = readConfigurationFile(CONFIGURATION_FILE)
 
 databaseInfo = database.DatabaseInfo(raw_host,raw_user,raw_pass,raw_dbname)
 
