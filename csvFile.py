@@ -45,6 +45,19 @@ def openCsvFile(filename):
    return csvOutput
 
 
+def openCsvWriter(filename):
+    """ Returns a csv writer pointing to the CSV file filename"""
+
+    try:
+        outputCsvFile = open(filename, 'wb')
+    except IOError:
+      print ("Error in opening output CSV file.") 
+      return False
+
+    csvOutput = csv.writer(outputCsvFile, delimiter=__CSV_DELIMETER__)
+
+    return csvOutput,outputCsvFile
+
 def getRecords(csvObject):
     """ Return the list of records found inside the CSV file """
     csvRecords = []

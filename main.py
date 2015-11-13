@@ -53,7 +53,7 @@ def changeCSVToDatabaseFormat(csvRecord):
 
 
 # Main function 
-def executeAddTransaction(csvFileName, dbInfo):
+def executeAddTransaction(csvFileName, dbInfo, csvOutputWriter):
         
         csvRows = csvFile.getRows(csvFileName)
 
@@ -64,9 +64,23 @@ def executeAddTransaction(csvFileName, dbInfo):
 
 	for i,csvRow in enumerate(csvRows):
             if(i>0):
-                csvRecord = csvFile.CSVRecord(csvRow)
-		donorInfo = changeCSVToDatabaseFormat(csvRecord)
-		database.addTransactionToDatabase(donorInfo, dbInfo)
+                try:
+                    csvRecord = csvFile.CSVRecord(csvRow)
+		    donorInfo = changeCSVToDatabaseFormat(csvRecord)
+		    database.addTransactionToDatabase(donorInfo, dbInfo)
+                except ValueError as e:
+                    csvOutputWriter.writerow(csvRow)
+                    print("Conversion Error:\n{0}\nwhen dealing with record:{1}".format(e, csvRow))
+                except KeyboardInterrupt as e:
+                    csvOutputWriter.writerow(csvRow)
+                    print("Operation interrupted by operator while dealing with record:{1}".format(csvRow))
+                    raise # we re-raise keyboard interruption to allow interruption of the program
+                except Exception as e:
+                    csvOutputWriter.writerow(csvRow)
+                    print("Program met Exception: {0} when dealing with record {1}".format(e, csvRow))
+            else:
+                # the first rows contains the headers, which we just copy
+                csvOutputWriter.writerow(csvRow)
 
 
 # Call the main command
@@ -75,4 +89,9 @@ def executeAddTransaction(csvFileName, dbInfo):
 
 databaseInfo = database.DatabaseInfo(raw_host,raw_user,raw_pass,raw_dbname)
 
-executeAddTransaction(raw_csvFilename, databaseInfo)
+csvOutputWriter,csvOutputFile = csvFile.openCsvWriter(csvErrorFileName)
+
+executeAddTransaction(raw_csvFilename, databaseInfo, csvOutputWriter)
+
+if csvOutputFile:
+    csvOutputFile.close()
