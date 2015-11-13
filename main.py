@@ -54,13 +54,17 @@ def changeCSVToDatabaseFormat(csvRecord):
 
 # Main function 
 def executeAddTransaction(csvFileName, dbInfo):
+        
+        csvRows = csvFile.getRows(csvFileName)
 
-	csvObject = csvFile.openCsvFile(csvFileName)
-	if csvObject == False:
-		return False
-	csvRecords = csvFile.getRecords(csvObject)
+	#csvObject = csvFile.openCsvFile(csvFileName)
+	#if csvObject == False:
+	#	return False
+	#csvRecords = csvFile.getRecords(csvObject)
 
-	for csvRecord in csvRecords:
+	for i,csvRow in enumerate(csvRows):
+            if(i>0):
+                csvRecord = csvFile.CSVRecord(csvRow)
 		donorInfo = changeCSVToDatabaseFormat(csvRecord)
 		database.addTransactionToDatabase(donorInfo, dbInfo)
 
