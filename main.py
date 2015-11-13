@@ -3,6 +3,9 @@
 import database
 import csvFile
 import getpass
+
+from datetime import datetime
+
 # import of module to parse configuration files
 # note that the module name will change  to configparser for Python3
 import ConfigParser
@@ -47,7 +50,7 @@ def changeCSVToDatabaseFormat(csvRecord):
 	donorInfo.province = csvRecord.province
 	donorInfo.postalCode = csvRecord.postalCode
 	donorInfo.amountPaid = float(csvRecord.amountPaid)
-	donorInfo.datePaid = csvRecord.datePaid
+	donorInfo.datePaid = datetime.strptime(csvRecord.datePaid,'%m/%d/%Y')
 
 	return donorInfo
 
