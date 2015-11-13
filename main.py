@@ -57,6 +57,9 @@ def executeAddTransaction(csvFileName, dbInfo, csvOutputWriter):
         
         csvRows = csvFile.getRows(csvFileName)
 
+        if not(csvRows) or not(csvOutputWriter) :
+            print("input or output CSV file cannot be opened.\nProcessing stopped.")
+            return
 	#csvObject = csvFile.openCsvFile(csvFileName)
 	#if csvObject == False:
 	#	return False
@@ -78,8 +81,9 @@ def executeAddTransaction(csvFileName, dbInfo, csvOutputWriter):
                 except Exception as e:
                     csvOutputWriter.writerow(csvRow)
                     print("Program met Exception: {0} when dealing with record {1}".format(e, csvRow))
-            else:
+            else: #i=0
                 # the first rows contains the headers, which we just copy
+                # to the output CSV file
                 csvOutputWriter.writerow(csvRow)
 
 

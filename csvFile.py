@@ -52,7 +52,7 @@ def openCsvWriter(filename):
         outputCsvFile = open(filename, 'wb')
     except IOError:
       print ("Error in opening output CSV file.") 
-      return False
+      return False, False
 
     csvOutput = csv.writer(outputCsvFile, delimiter=__CSV_DELIMETER__)
 
