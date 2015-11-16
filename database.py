@@ -117,7 +117,8 @@ def __addTransactionDetails(donorID, donorInfo):
 	#print("Date is "+donorInfo.datePaid)
 
 	try:
-		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
+		#dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
+		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid.strftime('%m/%d/%Y')))
 		return True
 	except MySQLdb.Error, e:
 		print ("Error %d: %s", e.args[0], e.args[1])

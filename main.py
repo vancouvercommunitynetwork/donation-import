@@ -3,6 +3,9 @@
 import database
 import csvFile
 import getpass
+
+from datetime import datetime
+
 # import of module to parse configuration files
 # note that the module name will change  to configparser for Python3
 import ConfigParser
@@ -28,11 +31,12 @@ def readConfigurationFile(file):
 	dbName = config.get(databaseSectionName,'dbName')
 
 	csvFileName = config.get('csvFile','csvFileName')
+        csvErrorFileName = config.get('csvFile','csvErrorFileName')
 
 	# Following line is only used for debugging
 	#print(",".join((host,userName,password,dbName,csvFileName)))
 
-	return (host,userName,password,dbName,csvFileName)
+	return (host,userName,password,dbName,csvFileName,csvErrorFileName)
 
 
 def changeCSVToDatabaseFormat(csvRecord):
@@ -46,28 +50,55 @@ def changeCSVToDatabaseFormat(csvRecord):
 	donorInfo.province = csvRecord.province
 	donorInfo.postalCode = csvRecord.postalCode
 	donorInfo.amountPaid = float(csvRecord.amountPaid)
-	donorInfo.datePaid = csvRecord.datePaid
+	donorInfo.datePaid = datetime.strptime(csvRecord.datePaid,'%m/%d/%Y')
 
 	return donorInfo
 
 
 # Main function 
-def executeAddTransaction(csvFileName, dbInfo):
+def executeAddTransaction(csvFileName, dbInfo, csvOutputWriter):
+        
+        csvRows = csvFile.getRows(csvFileName)
 
-	csvObject = csvFile.openCsvFile(csvFileName)
-	if csvObject == False:
-		return False
-	csvRecords = csvFile.getRecords(csvObject)
+        if not(csvRows) or not(csvOutputWriter) :
+            print("input or output CSV file cannot be opened.\nProcessing stopped.")
+            return
+	#csvObject = csvFile.openCsvFile(csvFileName)
+	#if csvObject == False:
+	#	return False
+	#csvRecords = csvFile.getRecords(csvObject)
 
-	for csvRecord in csvRecords:
-		donorInfo = changeCSVToDatabaseFormat(csvRecord)
-		database.addTransactionToDatabase(donorInfo, dbInfo)
+	for i,csvRow in enumerate(csvRows):
+            if(i>0):
+                try:
+                    csvRecord = csvFile.CSVRecord(csvRow)
+		    donorInfo = changeCSVToDatabaseFormat(csvRecord)
+		    database.addTransactionToDatabase(donorInfo, dbInfo)
+                except ValueError as e:
+                    csvOutputWriter.writerow(csvRow)
+                    print("Conversion Error:\n{0}\nwhen dealing with record:{1}".format(e, csvRow))
+                except KeyboardInterrupt as e:
+                    csvOutputWriter.writerow(csvRow)
+                    print("Operation interrupted by operator while dealing with record:{1}".format(csvRow))
+                    raise # we re-raise keyboard interruption to allow interruption of the program
+                except Exception as e:
+                    csvOutputWriter.writerow(csvRow)
+                    print("Program met Exception: {0} when dealing with record {1}".format(e, csvRow))
+            else: #i=0
+                # the first rows contains the headers, which we just copy
+                # to the output CSV file
+                csvOutputWriter.writerow(csvRow)
 
 
 # Call the main command
 
-(raw_host,raw_user,raw_pass,raw_dbname,raw_csvFilename) = readConfigurationFile(CONFIGURATION_FILE)
+(raw_host,raw_user,raw_pass,raw_dbname,raw_csvFilename,csvErrorFileName) = readConfigurationFile(CONFIGURATION_FILE)
 
 databaseInfo = database.DatabaseInfo(raw_host,raw_user,raw_pass,raw_dbname)
 
-executeAddTransaction(raw_csvFilename, databaseInfo)
+csvOutputWriter,csvOutputFile = csvFile.openCsvWriter(csvErrorFileName)
+
+executeAddTransaction(raw_csvFilename, databaseInfo, csvOutputWriter)
+
+if csvOutputFile:
+    csvOutputFile.close()

@@ -2,6 +2,7 @@
 # CSV file related functions
 
 from __future__ import print_function
+from __future__ import with_statement
 
 import csv
 
@@ -42,10 +43,44 @@ def openCsvFile(filename):
    csvOutput = csv.reader(csvFile, delimiter=__CSV_DELIMETER__)
    
    return csvOutput
+
+
+def openCsvWriter(filename):
+    """ Returns a csv writer pointing to the CSV file filename"""
+
+    try:
+        outputCsvFile = open(filename, 'wb')
+    except IOError:
+      print ("Error in opening output CSV file.") 
+      return False, False
+
+    csvOutput = csv.writer(outputCsvFile, delimiter=__CSV_DELIMETER__)
+
+    return csvOutput,outputCsvFile
+
 def getRecords(csvObject):
-   """ Return the list of records found inside the CSV file """
-   csvRecords = []
-   for row in csvObject:
-      csvRecords.append(CSVRecord(row))
-   del csvRecords[0] #Delete the first row containing the row labels
-   return csvRecords
+    """ Return the list of records found inside the CSV file """
+    csvRecords = []
+    for row in csvObject:
+        csvRecords.append(CSVRecord(row))
+    del csvRecords[0] #Delete the first row containing the row labels
+    return csvRecords
+
+
+def getRows(filename):
+    """ Return the list of complete records found inside the CSV file
+    and closes any file resource """
+
+    csvRows = []
+
+    try:
+        with open(filename, 'rb') as csvFile: 
+            csvInput = csv.reader(csvFile, delimiter=__CSV_DELIMETER__)
+
+            for row in csvInput:
+                csvRows.append(row)
+    except IOError:
+        print ("Error in opening/reading CSV file. Check if file exists...")
+        return False
+
+    return csvRows
