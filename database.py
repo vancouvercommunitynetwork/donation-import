@@ -3,7 +3,8 @@
 from __future__ import print_function
 
 import MySQLdb
-
+import datetime
+import datetime
 # Global variable to store the database object
 globalDB = 0
 DONORINFO_TABLE = "Individuals"
@@ -30,7 +31,7 @@ class DatabaseInfo:
 
 # Private
 def __getDonorID(donorInfo):
-	""" Return the ID# of the donor if the account exists already 
+	""" Return the ID# of the donor if the account exists already
 	- Matching is done by checking if the last and first name and address
 	matches the information from the database. If not, the program will
 	output all of the donors that matches the last name. The user will
@@ -71,13 +72,13 @@ def __getDonorID(donorInfo):
 			print ("Details from CSV file: \n %s, %s, %s" % (donorInfo.lastName, donorInfo.firstName, donorInfo.address))
 
 			raw_choice = raw_input("Input your choice (0 if none of the above): ")
-			
+
 			if raw_choice > 0:
 				return data[raw_choice - 1][0]
 			else:
 				# no match from the database results
 				return False
-			
+
 		# no match at all for last name
 		else:
 			return False
@@ -96,9 +97,9 @@ def __createDonor(donorInfo):
 
         try:
         	dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
-	       return __getDonorID(donorInfo)
+		return __getDonorID(donorInfo)
         except:
-               return False
+        	return False
 
 def __addTransactionDetails(donorID, donorInfo):
 	""" Add the transaction details to the Money_Brought_In table """
@@ -108,16 +109,17 @@ def __addTransactionDetails(donorID, donorInfo):
 		return False
 
 	dbCursor = globalDB.cursor()
-	# % signs in the STR_TO_DATE function must be escaped using %%, and quotes mu be escaped using \' 
+	# % signs in the STR_TO_DATE function must be escaped using %%, and quotes mu be escaped using \'
 	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) " + \
-			"VALUES (%s, %s, STR_TO_DATE(%s,\'%%m/%%d/%%Y\'), 'Donation', 0);"
-	
+			"VALUES (%s, %s, STR_TO_DATE(%s,'%%Y-%%m-%%d %%r'), 'Donation', 0);"
+
 	# Following lines used for debugging
 	#print("Query is: %s",sql)
 	#print("Date is "+donorInfo.datePaid)
 
 	try:
 		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
+        #print ("Date is "+ donorInfo.datePaid)
 		return True
 	except MySQLdb.Error, e:
 		print ("Error %d: %s", e.args[0], e.args[1])
@@ -155,7 +157,7 @@ def __closeDBConnection():
 # MAIN APIs
 def addTransactionToDatabase(donorDetails,dbInfo):
 	__connectToDB(dbInfo)
-	
+
 	global globalDB
 	if globalDB == 0:
 		print ("No database connection yet...")

@@ -3,6 +3,7 @@
 import database
 import csvFile
 import getpass
+from datetime import datetime
 # import of module to parse configuration files
 # note that the module name will change  to configparser for Python3
 import ConfigParser
@@ -12,9 +13,9 @@ DEFAULT_HOST 		= "localhost"
 DEFAULT_USER 		= "root"
 #stub-start
 #erase this!
-DEFAULT_PASS 		= "password"
+
 #stub-end
-DEFAULT_DBNAME 		= "DatabaseName"
+DEFAULT_DBNAME 		= "Money"
 DEFAULT_CSVFILENAME = "CharityDataDownload.csv"
 
 def readConfigurationFile(file):
@@ -29,9 +30,7 @@ def readConfigurationFile(file):
 
 	csvFileName = config.get('csvFile','csvFileName')
 
-	# Following line is only used for debugging
-	#print(",".join((host,userName,password,dbName,csvFileName)))
-
+	# Following l, "%H:%M %p"
 	return (host,userName,password,dbName,csvFileName)
 
 
@@ -46,12 +45,18 @@ def changeCSVToDatabaseFormat(csvRecord):
 	donorInfo.province = csvRecord.province
 	donorInfo.postalCode = csvRecord.postalCode
 	donorInfo.amountPaid = float(csvRecord.amountPaid)
-	donorInfo.datePaid = csvRecord.datePaid
+	donorInfo.datePaid = to_right_date_format(csvRecord.datePaid,csvRecord.timePaid)
 
 	return donorInfo
 
 
-# Main function 
+# Main function
+def to_right_date_format(p_date,p_time):
+	p_time = datetime.strptime(p_time, "%H:%M %p")
+	new_time = p_date + ' ' + p_time.strftime("%H:%M:%S")
+	return new_time
+
+
 def executeAddTransaction(csvFileName, dbInfo):
 
 	csvObject = csvFile.openCsvFile(csvFileName)
