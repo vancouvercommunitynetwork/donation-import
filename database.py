@@ -13,6 +13,7 @@ TRANSACTION_TABLE = "Money_Brought_In"
 class DonorInfo:
    """ Class for a donor information """
    def __init__(self):
+	  self.transNum = "000000000"
 	  self.firstName = ""
 	  self.lastName = ""
 	  self.address = ""
@@ -90,9 +91,9 @@ def __getTransID(donorID,donorInfo):
 		print ("No database connection yet")
 		return False
 	dbCursor = globalDB.cursor()
-	sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Id #` = CONVERT(%s,UNSIGNED INTEGER) AND `Date Payed` = %s AND `Amount Payed` = %s AND `For` = %s;"
-	getResult = dbCursor.execute(sql,(donorID, donorInfo.datePaid,donorInfo.amountPaid,'Credit Card'))
-	if getResult != 0: # exact match
+	sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Date Payed` = STR_TO_DATE(%s,'%%Y-%%m-%%d %%r') AND `Amount Payed` = %s AND `Paper Receipt` = %s ;"
+	getResult = dbCursor.execute(sql,( donorInfo.datePaid,donorInfo.amountPaid,donorInfo.transNum))
+	if getResult != 0:
 		#return ID number
 		data = dbCursor.fetchone()
 		return data[0]
@@ -125,15 +126,15 @@ def __addTransactionDetails(donorID, donorInfo):
 
 	dbCursor = globalDB.cursor()
 	# % signs in the STR_TO_DATE function must be escaped using %%, and quotes mu be escaped using \'
-	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`, `Main Login Id`) " + \
-			"VALUES (%s, %s, STR_TO_DATE(%s,'%%Y-%%m-%%d %%r'), 'Credit Card', 0, %s);"
+	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`, `Main Login Id`, `Paper Receipt`) " + \
+			"VALUES (%s, %s, STR_TO_DATE(%s,'%%Y-%%m-%%d %%r'), 'Credit Card', 0, %s, %s);"
 
 	# Following lines used for debugging
 	#print("Query is: %s",sql)
 	#print("Date is "+donorInfo.datePaid)
 
 	try:
-		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid,donorInfo.loginID))
+		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid,donorInfo.loginID,donorInfo.transNum))
 		#print ("Date is "+ donorInfo.datePaid)
 		return True
 	except MySQLdb.Error, e:

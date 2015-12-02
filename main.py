@@ -47,6 +47,7 @@ def changeCSVToDatabaseFormat(csvRecord):
 	donorInfo.amountPaid = float(csvRecord.amountPaid)
 	donorInfo.datePaid = to_right_date_format(csvRecord.datePaid,csvRecord.timePaid)
 	donorInfo.loginID = getLoginID(csvRecord.loginID)
+	donorInfo.transNum = csvRecord.transNum
 	return donorInfo
 
 def getLoginID(p_loginID):
