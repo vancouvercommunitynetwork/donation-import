@@ -13,14 +13,14 @@ TRANSACTION_TABLE = "Money_Brought_In"
 class DonorInfo:
    """ Class for a donor information """
    def __init__(self):
-      self.firstName = ""
-      self.lastName = ""
-      self.address = ""
-      self.city = ""
-      self.province = ""
-      self.postalCode = ""
-      self.amountPaid = 0
-      self.datePaid = '0000-00-00 00:00:00'
+	  self.firstName = ""
+	  self.lastName = ""
+	  self.address = ""
+	  self.city = ""
+	  self.province = ""
+	  self.postalCode = ""
+	  self.amountPaid = 0
+	  self.datePaid = '0000-00-00 00:00:00'
 class DatabaseInfo:
 	""" Class for the database information """
 	def __init__(self, host, username, password, databaseName):
@@ -83,6 +83,20 @@ def __getDonorID(donorInfo):
 		else:
 			return False
 	"""
+def __getTransID(donorID,donorInfo):
+	global globalDB
+	if globalDB == 0:
+		print ("No database connection yet")
+		return False
+	dbCursor = globalDB.cursor()
+	sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Id #` = CONVERT(%s,UNSIGNED INTEGER) AND `Date Payed` = %s AND `Amount Payed` = %s AND `For` = %s;"
+	getResult = dbCursor.execute(sql,(donorID, donorInfo.datePaid,donorInfo.amountPaid,'Credit Card'))
+	if getResult != 0: # exact match
+		#return ID number
+		data = dbCursor.fetchone()
+		return data[0]
+	else:
+		return False
 
 def __createDonor(donorInfo):
 	""" Returns the ID number of the created Donor """
@@ -95,11 +109,11 @@ def __createDonor(donorInfo):
 	sql = "INSERT INTO " + DONORINFO_TABLE + "(`First Name`, `Last Name`, `Street Address`, " + \
 			"`City`, `Province`, `Postal Code`) VALUES (%s, %s, %s, %s, %s, %s);"
 
-        try:
-        	dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
+	try:
+		dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
 		return __getDonorID(donorInfo)
-        except:
-        	return False
+	except:
+		return False
 
 def __addTransactionDetails(donorID, donorInfo):
 	""" Add the transaction details to the Money_Brought_In table """
@@ -111,7 +125,7 @@ def __addTransactionDetails(donorID, donorInfo):
 	dbCursor = globalDB.cursor()
 	# % signs in the STR_TO_DATE function must be escaped using %%, and quotes mu be escaped using \'
 	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) " + \
-			"VALUES (%s, %s, STR_TO_DATE(%s,'%%Y-%%m-%%d %%r'), 'Donation', 0);"
+			"VALUES (%s, %s, STR_TO_DATE(%s,'%%Y-%%m-%%d %%r'), 'Credit Card', 0);"
 
 	# Following lines used for debugging
 	#print("Query is: %s",sql)
@@ -119,7 +133,7 @@ def __addTransactionDetails(donorID, donorInfo):
 
 	try:
 		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
-        #print ("Date is "+ donorInfo.datePaid)
+		#print ("Date is "+ donorInfo.datePaid)
 		return True
 	except MySQLdb.Error, e:
 		print ("Error %d: %s", e.args[0], e.args[1])
@@ -168,12 +182,14 @@ def addTransactionToDatabase(donorDetails,dbInfo):
 	if donorID == False:
 		donorID = __createDonor(donorDetails)
 
-	if __addTransactionDetails(donorID, donorDetails) == True:
-		print ("Successful in adding transaction...")
-		__closeDBConnection()
-		return True
-	else:
-		print ("Error in adding transaction for %s %s" % (donorDetails.firstName, donorDetails.lastName))
+
+	if __getTransID(donorID, donorDetails) == False:
+		if __addTransactionDetails(donorID, donorDetails) == True:
+			print ("Successful in adding transaction...")
+			__closeDBConnection()
+			return True
+		else:
+			print ("Error in adding transaction for %s %s" % (donorDetails.firstName, donorDetails.lastName))
 
 	__closeDBConnection()
 	return False

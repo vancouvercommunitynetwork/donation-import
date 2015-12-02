@@ -50,13 +50,13 @@ def changeCSVToDatabaseFormat(csvRecord):
 	return donorInfo
 
 
-# Main function
 def to_right_date_format(p_date,p_time):
 	p_time = datetime.strptime(p_time, "%H:%M %p")
 	new_time = p_date + ' ' + p_time.strftime("%H:%M:%S")
 	return new_time
 
 
+# Main function
 def executeAddTransaction(csvFileName, dbInfo):
 
 	csvObject = csvFile.openCsvFile(csvFileName)
