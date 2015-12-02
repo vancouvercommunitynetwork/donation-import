@@ -13,6 +13,7 @@ __CSV_ADDRESS__ = 7
 __CSV_CITY__ = 9
 __CSV_PROVINCE__ = 10
 __CSV_POSTAL_CODE__ = 11
+__CSV_LOGIN_ID__ = 13
 __CSV_AMOUNT_PAID__ = 17
 __CSV_DATE_PAID__ = 18
 __CSV_TIME_PAID__ = 19
@@ -30,6 +31,7 @@ class CSVRecord:
       self.amountPaid = infoRow[__CSV_AMOUNT_PAID__]
       self.datePaid = infoRow[__CSV_DATE_PAID__]
       self.timePaid = infoRow[__CSV_TIME_PAID__]
+      self.loginID = infoRow[__CSV_LOGIN_ID__]
 # Main APIs
 def openCsvFile(filename):
    """ Return the CSV file as an iterator object """
