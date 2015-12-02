@@ -7,6 +7,7 @@ import csv
 
 # CONSTANTS
 """ Constants for CSV file """
+__CSV_TRANS_NUM__ = 0
 __CSV_FIRST_NAME__ = 4
 __CSV_LAST_NAME__ = 5
 __CSV_ADDRESS__ = 7
@@ -22,6 +23,7 @@ __CSV_DELIMETER__ = ','
 class CSVRecord:
    """ Class for a CSV row in the record """
    def __init__(self,infoRow):
+      self.transNum = infoRow[__CSV_TRANS_NUM__]
       self.firstName = infoRow[__CSV_FIRST_NAME__]
       self.lastName = infoRow[__CSV_LAST_NAME__]
       self.address = infoRow[__CSV_ADDRESS__]
