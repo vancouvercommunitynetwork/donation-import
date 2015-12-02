@@ -15,6 +15,7 @@ __CSV_PROVINCE__ = 10
 __CSV_POSTAL_CODE__ = 11
 __CSV_AMOUNT_PAID__ = 17
 __CSV_DATE_PAID__ = 18
+__CSV_TIME_PAID__ = 18
 __CSV_DELIMETER__ = ','
 
 class CSVRecord:
@@ -28,7 +29,7 @@ class CSVRecord:
       self.postalCode = infoRow[__CSV_POSTAL_CODE__]
       self.amountPaid = infoRow[__CSV_AMOUNT_PAID__]
       self.datePaid = infoRow[__CSV_DATE_PAID__]
-
+      self.timePaid = infoRow[__CSV_DATE_PAID__]
 # Main APIs
 def openCsvFile(filename):
    """ Return the CSV file as an iterator object """
@@ -40,7 +41,7 @@ def openCsvFile(filename):
       return False
 
    csvOutput = csv.reader(csvFile, delimiter=__CSV_DELIMETER__)
-   
+
    return csvOutput
 def getRecords(csvObject):
    """ Return the list of records found inside the CSV file """
