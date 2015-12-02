@@ -1,0 +1,7 @@
+[database]
+host=127.0.0.1
+userName=root
+password=0Tempest
+dbName=Money
+[csvFile]
+csvFileName=CharityDataDownload.csv
