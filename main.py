@@ -46,10 +46,17 @@ def changeCSVToDatabaseFormat(csvRecord):
 	donorInfo.postalCode = csvRecord.postalCode
 	donorInfo.amountPaid = float(csvRecord.amountPaid)
 	donorInfo.datePaid = to_right_date_format(csvRecord.datePaid,csvRecord.timePaid)
-
+	donorInfo.loginID = getLoginID(csvRecord.loginID)
 	return donorInfo
 
+def getLoginID(p_loginID):
+	if p_loginID[-10:] == '@vcn.bc.ca':
+		new_p_loginID = p_loginID[:-10]
+		return new_p_loginID
+	elif p_loginID == 'ANON':
+		return '000'
 
+	return p_loginID
 def to_right_date_format(p_date,p_time):
 	p_time = datetime.strptime(p_time, "%H:%M %p")
 	new_time = p_date + ' ' + p_time.strftime("%H:%M:%S")

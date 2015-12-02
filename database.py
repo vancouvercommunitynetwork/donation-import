@@ -21,6 +21,7 @@ class DonorInfo:
 	  self.postalCode = ""
 	  self.amountPaid = 0
 	  self.datePaid = '0000-00-00 00:00:00'
+	  self.loginID = 'xxxx@vcn.bc.ca'
 class DatabaseInfo:
 	""" Class for the database information """
 	def __init__(self, host, username, password, databaseName):
@@ -124,15 +125,15 @@ def __addTransactionDetails(donorID, donorInfo):
 
 	dbCursor = globalDB.cursor()
 	# % signs in the STR_TO_DATE function must be escaped using %%, and quotes mu be escaped using \'
-	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`) " + \
-			"VALUES (%s, %s, STR_TO_DATE(%s,'%%Y-%%m-%%d %%r'), 'Credit Card', 0);"
+	sql = "INSERT INTO " + TRANSACTION_TABLE + "(`ID #`, `Amount Payed`, `Date Payed`, `For`, `Cash`, `Main Login Id`) " + \
+			"VALUES (%s, %s, STR_TO_DATE(%s,'%%Y-%%m-%%d %%r'), 'Credit Card', 0, %s);"
 
 	# Following lines used for debugging
 	#print("Query is: %s",sql)
 	#print("Date is "+donorInfo.datePaid)
 
 	try:
-		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid))
+		dbCursor.execute(sql, (donorID, donorInfo.amountPaid, donorInfo.datePaid,donorInfo.loginID))
 		#print ("Date is "+ donorInfo.datePaid)
 		return True
 	except MySQLdb.Error, e:
