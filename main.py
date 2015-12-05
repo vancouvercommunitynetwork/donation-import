@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
+from DatabaseConnection import DatabaseConnection
 import database
 import csvFile
-import getpass
+#import getpass
 
 from datetime import datetime
 
@@ -56,8 +57,12 @@ def changeCSVToDatabaseFormat(csvRecord):
 
 
 # Main function 
-def executeAddTransaction(csvFileName, dbInfo, csvOutputWriter):
+def executeAddTransaction(csvFileName, DAO, csvOutputWriter):
+    """Processes content of csvFileName row by row
+    and uses DAO object to perform database updates
+    Records that cannot be processed are output to csvOutputWriter"""
         
+    # read all the rows from the input CSV file into an iterable
     csvRows = csvFile.getRows(csvFileName)
 
     if not(csvRows) or not(csvOutputWriter) :
@@ -68,12 +73,12 @@ def executeAddTransaction(csvFileName, dbInfo, csvOutputWriter):
     #    return False
     #csvRecords = csvFile.getRecords(csvObject)
 
-    for i,csvRow in enumerate(csvRows):
+    for i, csvRow in enumerate(csvRows):
         if(i>0):
             try:
                 csvRecord = csvFile.CSVRecord(csvRow)
                 donorInfo = changeCSVToDatabaseFormat(csvRecord)
-                database.addTransactionToDatabase(donorInfo, dbInfo)
+                DAO.addTransactionToDatabase(donorInfo)
             except ValueError as e:
                 csvOutputWriter.writerow(csvRow)
                 print("Conversion Error:\n{0}\nwhen dealing with record:{1}".format(e, csvRow))
@@ -92,13 +97,18 @@ def executeAddTransaction(csvFileName, dbInfo, csvOutputWriter):
 
 # Call the main command
 
+# Read the configuration file
 (raw_host,raw_user,raw_pass,raw_dbname,raw_csvFilename,csvErrorFileName) = readConfigurationFile(CONFIGURATION_FILE)
-
-databaseInfo = database.DatabaseInfo(raw_host,raw_user,raw_pass,raw_dbname)
-
+# Establish the database connection
+databaseConnection = DatabaseConnection(raw_host,raw_user,raw_pass,raw_dbname)
+#Create a database Access Object that will use the database connection
+databaseAccessObject = database.DatabaseAccessObject(databaseConnection)
+# Open output CSV file
 csvOutputWriter,csvOutputFile = csvFile.openCsvWriter(csvErrorFileName)
-
-executeAddTransaction(raw_csvFilename, databaseInfo, csvOutputWriter)
-
+# Process the transactions
+executeAddTransaction(raw_csvFilename, databaseAccessObject, csvOutputWriter)
+#Close the database connection
+databaseConnection.closeConnection()
+# close the output file
 if csvOutputFile:
     csvOutputFile.close()
