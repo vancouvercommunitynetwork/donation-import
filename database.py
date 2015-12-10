@@ -43,8 +43,8 @@ class DatabaseAccessObject:
             return False
 
         dbCursor = connection.cursor()
-        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Id #` = CONVERT(%s,UNSIGNED INTEGER) AND `Date Payed` = %s AND `Amount Payed` = %s AND `Paper Receipt` = %s;"
-        getResult = dbCursor.execute(sql,(donorID, donorInfo.datePaid,donorInfo.amountPaid,donorInfo.transNum))
+        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Paper Receipt` = %s;"
+        getResult = dbCursor.execute(sql,(donorInfo.transNum))
         if getResult != 0: # exact match
             #return ID number
             data = dbCursor.fetchone()
