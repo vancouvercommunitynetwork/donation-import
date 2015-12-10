@@ -1,4 +1,5 @@
+CharityDataDownload.csv
 csvFile.pyc
 database.pyc
-CharityDataDownload.csv
+DatabaseConnection.pyc
 donation_import.cfg~
