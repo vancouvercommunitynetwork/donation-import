@@ -66,16 +66,16 @@ class DatabaseAccessObject:
             return False
 
         dbCursor = connection.cursor()
+        sql = "SELECT `ID #` FROM " + DONORINFO_TABLE + " WHERE `Last Name` = %s AND `First Name` = %s AND `Street Address` = %s;" 
+        getResult = dbCursor.execute(sql,(donorInfo.lastName, donorInfo.firstName, donorInfo.address)) 
 
-        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Date Payed` = STR_TO_DATE(%s,'%%Y-%%m-%%d %%r') AND `Amount Payed` = %s AND `Paper Receipt` = %s ;"
-        getResult = dbCursor.execute(sql,( donorInfo.datePaid,donorInfo.amountPaid,donorInfo.transNum))
-
-        if getResult != 0:
-            #return ID number
-            data = dbCursor.fetchone()
-            return data[0]
-        else:
+        if getResult == 1: # exact match 
+            #return ID number 
+            data = dbCursor.fetchone() 
+            return data[0] 
+        else: 
             return False
+
         """
         # This algorithm is to display all matching last name and will let the user input a choice
         else: # multiple match or no match
