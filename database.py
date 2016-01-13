@@ -43,13 +43,17 @@ class DatabaseAccessObject:
             return False
 
         dbCursor = connection.cursor()
-        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Id #` = CONVERT(%s,UNSIGNED INTEGER) AND `Date Payed` = %s AND `Amount Payed` = %s AND `Paper Receipt` = %s;"
+        # Change 2016/01/13 by V.HERAUT: Date must be formatted for the select to work with times like 00:23:00, else 
+        # the query fails because DB time will be 00:23:00 and donorInfo.datePaid will be 12:23:00
+        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Id #` = CONVERT(%s,UNSIGNED INTEGER) AND `Date Payed` = STR_TO_DATE(%s,'%%Y-%%m-%%d %%r') AND `Amount Payed` = %s AND `Paper Receipt` = %s;"
         getResult = dbCursor.execute(sql,(donorID, donorInfo.datePaid,donorInfo.amountPaid,donorInfo.transNum))
         if getResult != 0: # exact match
             #return ID number
             data = dbCursor.fetchone()
             return data[0]
         else:
+            # Following print for debugging
+            #print ("Obtaining number of transactions with (donorID, firstName, lastName,  datePaid, amountPaid, transNUM) = (%s, %s, %s, %s, %s, %s)" % (donorID, donorInfo.firstName, donorInfo.lastName, donorInfo.datePaid,donorInfo.amountPaid,donorInfo.transNum))
             return False
 
     def __getDonorID(self,donorInfo):
