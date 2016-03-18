@@ -68,7 +68,12 @@ def getLoginID(p_loginID):
 
 
 def to_right_date_format(p_date,p_time):
-    p_time = datetime.strptime(p_time, "%H:%M %p")
+    p_date = p_date.split()[0]
+    p_date = p_date.split('/')
+    p_date.reverse()
+    p_date = "-".join(p_date)
+    p_time = datetime.strptime(p_time.split()[1], "%H:%M:%S")
+
     new_time = p_date + ' ' + p_time.strftime("%H:%M:%S")
     return new_time
 

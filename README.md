@@ -28,7 +28,7 @@
       - then sudo apt-get python-mysqldb
   - After Installing the important stuff:
     - Add the database in MySQL
-    - enter this: mysql -u root -p (mostly will ask for password)
+    - importing an .sql file:mysql -u root -p Cheese<sql_file_name.sql
     - in donation_imort.cfg, change these parameters to fix your mysql settings
       - userName=root
       - password=password

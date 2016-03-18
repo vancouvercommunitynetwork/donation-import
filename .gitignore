@@ -3,3 +3,8 @@ csvFile.pyc
 database.pyc
 DatabaseConnection.pyc
 donation_import.cfg~
+money_20160318.sql
+CharityDataDownload_first_one.csv
+gitignore
+.~lock.CharityDataDownload_first_one.csv#
+.~lock.CharityDataDownload.csv#
