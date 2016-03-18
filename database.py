@@ -43,8 +43,8 @@ class DatabaseAccessObject:
             return False
 
         dbCursor = connection.cursor()
-        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Id #` = CONVERT(%s,UNSIGNED INTEGER) AND `Date Payed` = %s AND `Amount Payed` = %s AND `Paper Receipt` = %s;"
-        getResult = dbCursor.execute(sql,(donorID, donorInfo.datePaid,donorInfo.amountPaid,donorInfo.transNum))
+        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Paper Receipt` = %s;"
+        getResult = dbCursor.execute(sql,(donorInfo.transNum))
         if getResult != 0: # exact match
             #return ID number
             data = dbCursor.fetchone()
@@ -67,8 +67,8 @@ class DatabaseAccessObject:
 
         dbCursor = connection.cursor()
 
-        sql = "SELECT* FROM " + TRANSACTION_TABLE + " WHERE `Date Payed` = STR_TO_DATE(%s,'%%Y-%%m-%%d %%r') AND `Amount Payed` = %s AND `Paper Receipt` = %s ;"
-        getResult = dbCursor.execute(sql,( donorInfo.datePaid,donorInfo.amountPaid,donorInfo.transNum))
+        sql = "SELECT* FROM " + DONORINFO_TABLE + " WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s;"
+        getResult = dbCursor.execute(sql,( donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
 
         if getResult != 0:
             #return ID number
