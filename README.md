@@ -41,3 +41,7 @@
     - If there are errors: either code error or something wrong with your config
       - If 'No database connection yet...' appears something wrong with your MySQL config in donation_imort.cfg
       - If 'Error in opening/reading CSV file. Check if file exists...' appears. Something wrong with your csv file config in  in donation_imort.cfg
+  - To delete the imported transaction just type:
+  ```
+  DELETE From Money_Brought_In WHERE `Paper Receipt` LIKE 'TR%' AND `For` = 'Credit Card';
+  ```
