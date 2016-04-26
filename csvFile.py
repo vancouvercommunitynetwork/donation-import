@@ -5,7 +5,7 @@ from __future__ import print_function
 from __future__ import with_statement
 
 import csv
-
+import pdb
 # CONSTANTS
 """ Constants for CSV file """
 __CSV_TRANS_NUM__ = 0
@@ -19,23 +19,29 @@ __CSV_LOGIN_ID__ = 13
 __CSV_AMOUNT_PAID__ = 17
 __CSV_DATE_PAID__ = 18
 __CSV_TIME_PAID__ = 19
+__CSV_WEBSITE__ = 23
+__CSV_PHONE_NUMBER__ = 25
 __CSV_DELIMETER__ = ','
+
+MAX_CHAR = 30
 
 class CSVRecord:
     """ Class for a CSV row in the record """
-    def __init__(self,infoRow):
-        self.transNum = infoRow[__CSV_TRANS_NUM__]
-        self.firstName = infoRow[__CSV_FIRST_NAME__]
-        self.lastName = infoRow[__CSV_LAST_NAME__]
-        self.address = infoRow[__CSV_ADDRESS__]
-        self.city = infoRow[__CSV_CITY__]
-        self.province = infoRow[__CSV_PROVINCE__]
-        self.postalCode = infoRow[__CSV_POSTAL_CODE__]
-        self.amountPaid = infoRow[__CSV_AMOUNT_PAID__]
-        self.datePaid = infoRow[__CSV_DATE_PAID__]
-        self.timePaid = infoRow[__CSV_TIME_PAID__]
-        self.loginID = infoRow[__CSV_LOGIN_ID__]
-
+    def __init__(self,infoRow,maxRow):
+        self.transNum = infoRow[__CSV_TRANS_NUM__][:MAX_CHAR]
+        self.firstName = infoRow[__CSV_FIRST_NAME__][:MAX_CHAR]
+        self.lastName = infoRow[__CSV_LAST_NAME__][:MAX_CHAR]
+        self.address = infoRow[__CSV_ADDRESS__][:MAX_CHAR]
+        self.city = infoRow[__CSV_CITY__][:MAX_CHAR]
+        self.province = infoRow[__CSV_PROVINCE__][:MAX_CHAR]
+        self.postalCode = infoRow[__CSV_POSTAL_CODE__][:MAX_CHAR]
+        self.amountPaid = infoRow[__CSV_AMOUNT_PAID__][:MAX_CHAR]
+        self.datePaid = infoRow[__CSV_DATE_PAID__][:MAX_CHAR]
+        self.timePaid = infoRow[__CSV_TIME_PAID__][:MAX_CHAR]
+        self.loginID = infoRow[__CSV_LOGIN_ID__][:MAX_CHAR]
+        if maxRow >= 25:
+            self.webSite = infoRow[__CSV_WEBSITE__][:MAX_CHAR]
+            self.phoneNumber = infoRow[__CSV_PHONE_NUMBER__][:MAX_CHAR]
 # Main APIs
 def openCsvFile(filename):
     """ Return the CSV file as an iterator object """
@@ -82,9 +88,9 @@ def getRows(filename):
     try:
         with open(filename, 'rb') as csvFile:
             csvInput = csv.reader(csvFile, delimiter=__CSV_DELIMETER__)
-
             for row in csvInput:
-                csvRows.append(row)
+                if row is not None:
+                    csvRows.append(row)
     except IOError:
         print ("Error in opening/reading CSV file. Check if file exists...")
         return False

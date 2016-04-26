@@ -3,6 +3,7 @@
 from DatabaseConnection import DatabaseConnection
 import database
 import csvFile
+import pdb
 #import getpass
 
 from datetime import datetime
@@ -40,20 +41,28 @@ def readConfigurationFile(file):
     return (host,userName,password,dbName,csvFileName,csvErrorFileName)
 
 
-def changeCSVToDatabaseFormat(csvRecord):
+def changeCSVToDatabaseFormat(csvRecord,maxRow):
     """ Change the CSV format to a more suitable format for database addition """
 
-    donorInfo = database.DonorInfo()
+    donorInfo = database.DonorInfo(maxRow)
     donorInfo.firstName = csvRecord.firstName
     donorInfo.lastName = csvRecord.lastName
     donorInfo.address = csvRecord.address
     donorInfo.city = csvRecord.city
     donorInfo.province = csvRecord.province
     donorInfo.postalCode = csvRecord.postalCode
-    donorInfo.amountPaid = float(csvRecord.amountPaid)
-    donorInfo.datePaid = to_right_date_format(csvRecord.datePaid,csvRecord.timePaid)
+    if csvRecord.amountPaid != '':
+        donorInfo.amountPaid = float(csvRecord.amountPaid)
+    else:
+        donorInfo.amountPaid = 0.0
+    if csvRecord.datePaid != '':
+        donorInfo.datePaid = to_right_date_format(csvRecord.datePaid,csvRecord.timePaid)
     donorInfo.loginID = getLoginID(csvRecord.loginID)
     donorInfo.transNum = csvRecord.transNum
+
+    if maxRow > 23:
+        donorInfo.phoneNumber = csvRecord.phoneNumber
+        donorInfo.webSite = csvRecord.webSite
 
     return donorInfo
 
@@ -97,8 +106,8 @@ def executeAddTransaction(csvFileName, DAO, csvOutputWriter):
     for i, csvRow in enumerate(csvRows):
         if(i>0):
             try:
-                csvRecord = csvFile.CSVRecord(csvRow)
-                donorInfo = changeCSVToDatabaseFormat(csvRecord)
+                csvRecord = csvFile.CSVRecord(csvRow,len(csvRow))
+                donorInfo = changeCSVToDatabaseFormat(csvRecord,len(csvRow))
                 DAO.addTransactionToDatabase(donorInfo)
             except ValueError as e:
                 csvOutputWriter.writerow(csvRow)

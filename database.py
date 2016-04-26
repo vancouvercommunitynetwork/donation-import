@@ -6,15 +6,18 @@ import MySQLdb
 import datetime
 
 import DatabaseConnection
+import pdb
 
 
 # Global variable to store the database object
 DONORINFO_TABLE = "Individuals"
 TRANSACTION_TABLE = "Money_Brought_In"
 
+MAX_CHAR = 30
+
 class DonorInfo:
     """ Class for a donor information """
-    def __init__(self):
+    def __init__(self,maxRow):
         self.transNum = "000000000"
         self.firstName = ""
         self.lastName = ""
@@ -25,7 +28,8 @@ class DonorInfo:
         self.amountPaid = 0
         self.datePaid = '0000-00-00 00:00:00'
         self.loginID = 'xxxx@vcn.bc.ca'
-
+        self.webSite = ''
+        self.phoneNumber = ''
 class DatabaseAccessObject:
     """ Class for the accessing database information """
     def __init__(self, databaseConnection):
@@ -36,6 +40,10 @@ class DatabaseAccessObject:
     def __getTransID(self,donorID,donorInfo):
         """ Returns a transaction ID if there is an exact match for ID,
         date and amount for a credit card"""
+        # skip validation and adding to database if no transNum
+        if donorInfo.transNum == None:
+            return True
+
 
         connection = self.databaseConnection.getConnection()
         if connection == 0:
@@ -51,6 +59,27 @@ class DatabaseAccessObject:
             return data[0]
         else:
             return False
+
+
+    def __updateDonor(self,donorInfo):
+        if donorInfo.phoneNumber == '' and donorInfo.webSite == '':
+            return False
+        connection = self.databaseConnection.getConnection()
+        if connection == 0:
+            print ("No database connection yet")
+            return False
+
+        dbCursor = connection.cursor()
+        sql = "SELECT* FROM " + DONORINFO_TABLE + " WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s AND `URL` = %s AND `Phone (Home)` = %s;"
+        getResult = dbCursor.execute(sql,( donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode, donorInfo.webSite,donorInfo.phoneNumber))
+        if getResult == 0:
+            # pdb.set_trace()
+            sql = "UPDATE Individuals SET `URL`= %s, `Phone (Home)`= %s WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s"
+            getResult = dbCursor.execute(sql,(donorInfo.webSite, donorInfo.phoneNumber, donorInfo.firstName, donorInfo.lastName[:MAX_CHAR], donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode ))
+            return True
+        return False;
+
+
 
     def __getDonorID(self,donorInfo):
         """ Return the ID# of the donor if the account exists already
@@ -68,11 +97,14 @@ class DatabaseAccessObject:
         dbCursor = connection.cursor()
 
         sql = "SELECT* FROM " + DONORINFO_TABLE + " WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s;"
-        getResult = dbCursor.execute(sql,( donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
+        getResult = dbCursor.execute(sql,( donorInfo.firstName, donorInfo.lastName[:MAX_CHAR], donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
 
         if getResult != 0:
+
             #return ID number
             data = dbCursor.fetchone()
+            if self.__updateDonor(donorInfo):
+                print("Donor updated")
             return data[0]
         else:
             return False
@@ -81,7 +113,7 @@ class DatabaseAccessObject:
         else: # multiple match or no match
             sql = "SELECT `ID #`, `Last Name`, `First Name`, `Street Address` " + \
                 "FROM " + DONORINFO_TABLE + " WHERE `Last Name` = %s"
-            getResult = dbCursor.execute(sql, (donorInfo.lastName))
+            getResult = dbCursor.execute(sql, (donorInfo.lastName[:MAX_CHAR]))
 
             # with multiple matches, display results so user can select the right account
             if getResult > 0:
@@ -91,7 +123,7 @@ class DatabaseAccessObject:
                 for row in data:
                     print "%d. %s, %s, %s"%(counter, row[1], row[2], row[3])
                     counter += 1
-                print ("Details from CSV file: \n %s, %s, %s" % (donorInfo.lastName, donorInfo.firstName, donorInfo.address))
+                print ("Details from CSV file: \n %s, %s, %s" % (donorInfo.lastName[:MAX_CHAR], donorInfo.firstName, donorInfo.address))
 
                 raw_choice = raw_input("Input your choice (0 if none of the above): ")
 
@@ -115,9 +147,11 @@ class DatabaseAccessObject:
 
         dbCursor = connection.cursor()
 
+
+
         sql = "INSERT INTO " + DONORINFO_TABLE + "(`First Name`, `Last Name`, `Street Address`, " + \
-            "`City`, `Province`, `Postal Code`) VALUES (%s, %s, %s, %s, %s, %s);"
-        dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode))
+            "`City`, `Province`, `Postal Code`,`URL`,`Phone (Home)`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+        dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName[:MAX_CHAR], donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode, donorInfo.webSite,donorInfo.phoneNumber))
 
         return self.__getDonorID(donorInfo)
 
@@ -155,6 +189,7 @@ class DatabaseAccessObject:
 
         if donorID == False:
             donorID = self.__createDonor(donorDetails)
+            print("Donor created")
 
         if self.__getTransID(donorID, donorDetails) == False:
             if self.__addTransactionDetails(donorID, donorDetails) == True:

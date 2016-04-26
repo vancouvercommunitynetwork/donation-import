@@ -8,3 +8,9 @@ CharityDataDownload_first_one.csv
 gitignore
 .~lock.CharityDataDownload_first_one.csv#
 .~lock.CharityDataDownload.csv#
+Mar22_16_backup.sql
+backup.sql
+donations_20160425.sql
+NganCharityDataDownload_test.csv
+NganCharityDataDownload_test2.csv
+NganCharityDataDownload_test3.csv
