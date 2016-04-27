@@ -63,6 +63,7 @@ def changeCSVToDatabaseFormat(csvRecord,maxRow):
     if maxRow > 23:
         donorInfo.phoneNumber = csvRecord.phoneNumber
         donorInfo.webSite = csvRecord.webSite
+        donorInfo.host_by_vcn = csvRecord.host_by_vcn
 
     return donorInfo
 

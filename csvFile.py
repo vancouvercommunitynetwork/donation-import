@@ -20,6 +20,7 @@ __CSV_AMOUNT_PAID__ = 17
 __CSV_DATE_PAID__ = 18
 __CSV_TIME_PAID__ = 19
 __CSV_WEBSITE__ = 23
+__CSV_HOSTBY_VCN__ = 24
 __CSV_PHONE_NUMBER__ = 25
 __CSV_DELIMETER__ = ','
 
@@ -40,6 +41,7 @@ class CSVRecord:
         self.timePaid = infoRow[__CSV_TIME_PAID__][:MAX_CHAR]
         self.loginID = infoRow[__CSV_LOGIN_ID__][:MAX_CHAR]
         if maxRow >= 25:
+            self.host_by_vcn = infoRow[__CSV_HOSTBY_VCN__][:MAX_CHAR]
             self.webSite = infoRow[__CSV_WEBSITE__][:MAX_CHAR]
             self.phoneNumber = infoRow[__CSV_PHONE_NUMBER__][:MAX_CHAR]
 # Main APIs

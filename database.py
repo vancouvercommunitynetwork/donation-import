@@ -29,6 +29,7 @@ class DonorInfo:
         self.datePaid = '0000-00-00 00:00:00'
         self.loginID = 'xxxx@vcn.bc.ca'
         self.webSite = ''
+        self.host_by_vcn = 0
         self.phoneNumber = ''
 class DatabaseAccessObject:
     """ Class for the accessing database information """
@@ -70,12 +71,12 @@ class DatabaseAccessObject:
             return False
 
         dbCursor = connection.cursor()
-        sql = "SELECT* FROM " + DONORINFO_TABLE + " WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s AND `URL` = %s AND `Phone (Home)` = %s;"
-        getResult = dbCursor.execute(sql,( donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode, donorInfo.webSite,donorInfo.phoneNumber))
+        sql = "SELECT* FROM " + DONORINFO_TABLE + " WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s AND `URL` = %s AND `Phone (Home)` = %s AND `Host with VCN` = %s;"
+        getResult = dbCursor.execute(sql,( donorInfo.firstName, donorInfo.lastName, donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode, donorInfo.webSite,donorInfo.phoneNumber,donorInfo.host_by_vcn))
         if getResult == 0:
             # pdb.set_trace()
-            sql = "UPDATE Individuals SET `URL`= %s, `Phone (Home)`= %s WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s"
-            getResult = dbCursor.execute(sql,(donorInfo.webSite, donorInfo.phoneNumber, donorInfo.firstName, donorInfo.lastName[:MAX_CHAR], donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode ))
+            sql = "UPDATE Individuals SET `URL`= %s, `Phone (Home)`= %s, `Host with VCN` = %s WHERE `First Name` = %s AND `Last Name` = %s AND `Street Address` = %s AND `City` = %s AND `Province` = %s AND `Postal Code` = %s "
+            getResult = dbCursor.execute(sql,(donorInfo.webSite, donorInfo.phoneNumber,donorInfo.host_by_vcn, donorInfo.firstName, donorInfo.lastName[:MAX_CHAR], donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode ))
             return True
         return False;
 
@@ -150,8 +151,8 @@ class DatabaseAccessObject:
 
 
         sql = "INSERT INTO " + DONORINFO_TABLE + "(`First Name`, `Last Name`, `Street Address`, " + \
-            "`City`, `Province`, `Postal Code`,`URL`,`Phone (Home)`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-        dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName[:MAX_CHAR], donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode, donorInfo.webSite,donorInfo.phoneNumber))
+            "`City`, `Province`, `Postal Code`,`URL`,`Phone (Home)`,`Host with VCN`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s);"
+        dbCursor.execute(sql, (donorInfo.firstName, donorInfo.lastName[:MAX_CHAR], donorInfo.address, donorInfo.city, donorInfo.province, donorInfo.postalCode, donorInfo.webSite,donorInfo.phoneNumber,donorInfo.host_by_vcn))
 
         return self.__getDonorID(donorInfo)
 
