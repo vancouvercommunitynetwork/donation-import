@@ -3,6 +3,7 @@
 import csv
 import sys
 
+# Fields to export
 FORMAL_TITLE="DONOR TITLE"
 FIRST_NAME="DONOR FIRST NAME"
 LAST_NAME="DONOR LAST NAME"
@@ -24,12 +25,19 @@ DATE_RECEIVED="DONATION DATE"
 SOURCE="DONATION SOURCE"
 NOTE="MESSAGE TO CHARITY"
 
+# the order and which fields to export
 INDIVIDUAL_CONTACT=(EXTERNAL_ID, FORMAL_TITLE, FIRST_NAME, LAST_NAME, ADDRESS, SUPPLEMENTAL_ADDRESS_1, CITY, STATE, POSTAL_CODE, COUNTRY, PHONE, EMAIL)
 INDIVIDUAL_DONATION=(EXTERNAL_ID, INVOICE_NUMBER, TOTAL_AMOUNT, DATE_RECEIVED, SOURCE, NOTE)
 ORGANIZATION_CONTACT=(EXTERNAL_ID, COMPANY_NAME, ADDRESS, SUPPLEMENTAL_ADDRESS_1, CITY, STATE, POSTAL_CODE, COUNTRY, PHONE, EMAIL)
 ORGANIZATION_DONATION=(EXTERNAL_ID, INVOICE_NUMBER, TOTAL_AMOUNT, DATE_RECEIVED, SOURCE, NOTE)
 
 def export(fileName, outputFolder):
+	""" Export the four files
+
+	Arugment:
+		fileName     -- (String) the input csv file path
+		outputFolder -- (String) the output folder path
+	"""
 	ind_contacts = []
 	ind_donations = []
 	org_contacts = []
@@ -51,6 +59,13 @@ def export(fileName, outputFolder):
 	outputFile(outputFolder + "/organization_donations.csv", org_donations)
 
 def fillList(row, keys):
+	""" Create a list with the database row and list of table key
+
+	Argument:
+		row  -- (Dictionary) the row of database
+		keys -- (List)       the keys to extract the data
+	"""
+
 	answer = []
 	for key in keys:
 		if key in row:
@@ -60,6 +75,12 @@ def fillList(row, keys):
 	return answer
 
 def outputFile(fileName, items):
+	""" Output a csv file
+
+	Argument:
+		fileName -- (String) the csv file path
+		items    -- (List)   list of items to export
+	"""
 	with open(fileName, 'wb') as csvFile:
 		output = csv.writer(csvFile)
 		for item in items:
