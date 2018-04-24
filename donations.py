@@ -9,12 +9,6 @@ To use this python script run:
 python export.py ${canada_help_csv} ${export_folder}
 ~~~
 
-If the script gives you a `_csv.Error: line contains NULL byte` error,
-run the fllowing to remove null first.
-~~~
-tr -d '\000' < ${problem_file}  > ${use_file}
-~~~
-
 #Other info
 - All text with "Anon" will becomes empty. This is a mean to reduces errors
 - Anonoymous donation will go to the individual with "ANON" as the external id
@@ -58,6 +52,7 @@ NOTE="MESSAGE TO CHARITY"
 FINANCIAL_TYPE = "Donation" #REQUIRED
 
 # Constants used in this file===================================================
+RE_ENCODED_FILE = "reencoded.csv"
 IND_CONTACT_FILE = "/individual_contacts.csv"
 IND_DONATION_FILE = "/individual_donations.csv"
 ORG_CONTACT_FILE = "/organization_contacts.csv"
@@ -81,7 +76,15 @@ def export(fileName, outputFolder):
 	org_contacts = []
 	org_donations =[]
 
-	with open(fileName, 'rb') as csvFile:
+	with open(fileName, 'rb') as csvFile: # open export file
+		with open(RE_ENCODED_FILE, 'wb') as encode: # open write file
+			# takes the export file and do the following things:
+			# - change the uncoding from utf-8 BOM to utf-8
+			# - remove all the null characters
+			# - save the file so the csv.DictReader can reopen it and read it
+			encode.write(csvFile.read().decode("utf-8-sig").encode("utf-8").replace('\x00', ''))
+
+	with open(RE_ENCODED_FILE, 'rb') as csvFile:
 		# exctract file into a dictionary
 		reader = csv.DictReader(csvFile)
 		for row in reader:
@@ -194,7 +197,8 @@ def getField(row, field, default=""):
 			return default
 		return ans
 	else:
-		print ("Missing Field: \"" + field + "\". Exporting as \"" + defualt + "\".")
+		print ("Missing Field: \"" + field + "\". Exporting as \"" + default + "\".")
+		# print (row)
 		return default
 
 def output_file(fileName, items):
