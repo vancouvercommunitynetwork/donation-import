@@ -1,15 +1,32 @@
-#!/bin/usr/python
+#!/usr/bin/python
 """ Create a CSV to import into CiviCRM from CanadaHelps output CSV.
 
-Fields order or their existances are not an issue with this script. But this
-does not mean resulting csv file will import into CiviCRM successfully.
+Fields order or their existances are not an issue with this script. But *this*
+*does not mean resulting csv file will import into CiviCRM successfully*.
+
+To use this python script run:
+~~~bash
+python export.py ${canada_help_csv} ${export_folder}
+~~~
+
+If the script gives you a `_csv.Error: line contains NULL byte` error,
+run the fllowing to remove null first.
+~~~
+tr -d '\000' < ${problem_file}  > ${use_file}
+~~~
+
+#Other info
+- All text with "Anon" will becomes empty. This is a mean to reduces errors
+- Anonoymous donation will go to the individual with "ANON" as the external id
+- Anonoymous will not add into the contact import file
+-
 """
 
 import csv
 import sys
 import datetime
 
-# Fields to export
+# Fields to export, values are the fields in the CanadaHelps csv file
 FORMAL_TITLE="DONOR TITLE"
 FIRST_NAME="DONOR FIRST NAME" #REQUIRED
 LAST_NAME="DONOR LAST NAME" #REQUIRED
@@ -31,6 +48,18 @@ DATE_RECEIVED="DONATION DATE"
 SOURCE="DONATION SOURCE"
 NOTE="MESSAGE TO CHARITY"
 
+# Fields to export, values are the export value
+FINANCIAL_TYPE = "Donation"
+
+# Constants used in this file
+IND_CONTACT_FILE = "/individual_contacts.csv"
+IND_DONATION_FILE = "/individual_donations.csv"
+ORG_CONTACT_FILE = "/organization_contacts.csv"
+ORG_DONATION_FILE = "/organization_donations.csv"
+
+ANON="ANON"
+
+
 def export(fileName, outputFolder):
 	""" Export the four files
 
@@ -47,16 +76,18 @@ def export(fileName, outputFolder):
 		for row in reader:
 			contact = []
 			donation = []
-			if row[COMPANY_NAME] == '' or row[COMPANY_NAME] == 'Anon':
+			if row[COMPANY_NAME] == '':
 				ind_contacts.append(fill_individual_contract(row))
 				ind_donations.append(fill_donation(row))
+			elif row[COMPANY_NAME].upper() == ANON:
+				ind_donations.append(fill_donation(row, ANON))
 			else:
 				org_contacts.append(fill_organization_contract(row))
 				org_donations.append(fill_donation(row))
-	output_file(outputFolder + "/individual_contracts.csv", ind_contacts)
-	output_file(outputFolder + "/individual_donations.csv", ind_donations)
-	output_file(outputFolder + "/organization_contracts.csv", org_contacts)
-	output_file(outputFolder + "/organization_donations.csv", org_donations)
+	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
+	output_file(outputFolder + IND_DONATION_FILE, ind_donations)
+	output_file(outputFolder + ORG_CONTACT_FILE, org_contacts)
+	output_file(outputFolder + ORG_DONATION_FILE, org_donations)
 
 def fill_individual_contract(row):
 	""" Create a csv row for individual contact.
@@ -65,18 +96,18 @@ def fill_individual_contract(row):
 		row -- (Dictionary) the row extract data from
 	"""
 	contact = []
-	contact.append(row[EXTERNAL_ID])
-	contact.append(row[FORMAL_TITLE])
-	contact.append(row[FIRST_NAME])
-	contact.append(row[LAST_NAME])
-	contact.append(row[ADDRESS])
-	contact.append(row[SUPPLEMENTAL_ADDRESS_1])
-	contact.append(row[CITY])
-	contact.append(row[STATE])
-	contact.append(row[POSTAL_CODE])
-	contact.append(row[COUNTRY])
-	contact.append(row[PHONE])
-	contact.append(row[EMAIL])
+	contact.append(getField(row, EXTERNAL_ID))
+	contact.append(getField(row, FORMAL_TITLE))
+	contact.append(getField(row, FIRST_NAME))
+	contact.append(getField(row, LAST_NAME))
+	contact.append(getField(row, ADDRESS))
+	contact.append(getField(row, SUPPLEMENTAL_ADDRESS_1))
+	contact.append(getField(row, CITY))
+	contact.append(getField(row, STATE))
+	contact.append(getField(row, POSTAL_CODE))
+	contact.append(getField(row, COUNTRY))
+	contact.append(getField(row, PHONE))
+	contact.append(getField(row, EMAIL))
 	return contact
 
 def fill_organization_contract(row):
@@ -86,34 +117,54 @@ def fill_organization_contract(row):
 		row -- (Dictionary) the row extract data from
 	"""
 	contact = []
-	contact.append(row[EXTERNAL_ID])
-	contact.append(row[COMPANY_NAME])
-	contact.append(row[ADDRESS])
-	contact.append(row[SUPPLEMENTAL_ADDRESS_1])
-	contact.append(row[CITY])
-	contact.append(row[STATE])
-	contact.append(row[POSTAL_CODE])
-	contact.append(row[COUNTRY])
-	contact.append(row[PHONE])
-	contact.append(row[EMAIL])
+	contact.append(getField(row, EXTERNAL_ID))
+	contact.append(getField(row, COMPANY_NAME))
+	contact.append(getField(row, ADDRESS))
+	contact.append(getField(row, SUPPLEMENTAL_ADDRESS_1))
+	contact.append(getField(row, CITY))
+	contact.append(getField(row, STATE))
+	contact.append(getField(row, POSTAL_CODE))
+	contact.append(getField(row, COUNTRY))
+	contact.append(getField(row, PHONE))
+	contact.append(getField(row, EMAIL))
 	return contact
 
-def fill_donation(row):
+def fill_donation(row, external=""):
 	""" Create a csv row for donation.
 
 	Argument:
 		row -- (Dictionary) the row extract data from
 	"""
 	donation = []
-	donation.append(row[EXTERNAL_ID])
-	donation.append(row[INVOICE_NUMBER])
-	donation.append(row[TOTAL_AMOUNT])
-	date = datetime.datetime.strptime(row[DATE_RECEIVED], '%Y/%m/%d').strftime('%Y-%m-%d')
+	donation.append(getField(row, EXTERNAL_ID, external))
+	donation.append(getField(row, INVOICE_NUMBER))
+
+	amount_str = getField(row, TOTAL_AMOUNT, '0')
+	amount_float = float(amount_str)
+	donation.append("{:.2f}".format(amount_float))
+
+	date_raw = getField(row, DATE_RECEIVED)
+	try:
+		date = datetime.datetime.strptime(date_raw, '%Y/%m/%d').strftime('%Y-%m-%d')
+	except ValueError:
+		datetime.datetime.strptime(date_raw, "%Y-%m-%d")
+		date = date_raw
 	donation.append(date)
-	donation.append(row[SOURCE])
-	donation.append(row[NOTE])
-	donation.append("Donation")
+
+	donation.append(getField(row, SOURCE))
+	donation.append(getField(row, NOTE))
+	donation.append(FINANCIAL_TYPE)
 	return donation
+
+def getField(row, field, default=""):
+	if field in row:
+		ans = row[field]
+		if ans.upper() == ANON:
+			return default
+		return ans
+	else:
+		print(field)
+		return default
 
 def output_file(fileName, items):
 	""" Output a csv file
@@ -138,8 +189,12 @@ def main(argv):
 	"""
 	if len(argv) == 2:
 		export(argv[0], argv[1])
+	elif len(argv) == 1:
+		export(argv[0], ".")
+	elif len(argv) == 0:
+		export("CharityDataDownload.csv", ".")
 	else:
-		print("Usage: python export.py ${canada_help_csv} ${import_folder} # to store 4 files.")
+		print("Usage: python export.py ${canada_help_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
 	main(sys.argv[1:])
