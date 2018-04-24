@@ -21,14 +21,18 @@ tr -d '\000' < ${problem_file}  > ${use_file}
 - Anonoymous will not add into the contact import file
 - If the field is not found or is "ANON", then field will be empty, except for
   total amount, which will be 0.00
-- the date format can be either %Y/%m/%d '%Y-%m-%d'
+- the date format can be either %Y/%m/%d or %Y-%m-%d
+- header line is needed for the imporint CanadaHelps csv file
 """
 
 import csv
 import sys
 import datetime
 
-# Fields to export, values are the fields in the CanadaHelps csv file
+# Fields to export==============================================================
+# Variable names are the name that the fields should import into
+
+# The values here are the files in the CanadaHelps csv file
 FORMAL_TITLE="DONOR TITLE"
 FIRST_NAME="DONOR FIRST NAME" #REQUIRED
 LAST_NAME="DONOR LAST NAME" #REQUIRED
@@ -47,13 +51,13 @@ EXTERNAL_ID="DONOR EMAIL ADDRESS" #REQUIRED
 INVOICE_NUMBER="TRANSACTION NUMBER"
 TOTAL_AMOUNT="AMOUNT" #REQUIRED
 DATE_RECEIVED="DONATION DATE"
-SOURCE="DONATION SOURCE"
+DONATION_SOURCE="DONATION SOURCE"
 NOTE="MESSAGE TO CHARITY"
 
-# Fields to export, values are the export value
-FINANCIAL_TYPE = "Donation"
+# Values are the export value
+FINANCIAL_TYPE = "Donation" #REQUIRED
 
-# Constants used in this file
+# Constants used in this file===================================================
 IND_CONTACT_FILE = "/individual_contacts.csv"
 IND_DONATION_FILE = "/individual_donations.csv"
 ORG_CONTACT_FILE = "/organization_contacts.csv"
@@ -61,6 +65,7 @@ ORG_DONATION_FILE = "/organization_donations.csv"
 
 ANON="ANON"
 
+# Main export function==========================================================
 
 def export(fileName, outputFolder):
 	""" Export the four files
@@ -69,15 +74,17 @@ def export(fileName, outputFolder):
 		fileName     -- (String) the input csv file path
 		outputFolder -- (String) the output folder path
 	"""
+
+	# output list
 	ind_contacts = []
 	ind_donations = []
 	org_contacts = []
 	org_donations =[]
+
 	with open(fileName, 'rb') as csvFile:
+		# exctract file into a dictionary
 		reader = csv.DictReader(csvFile)
 		for row in reader:
-			contact = []
-			donation = []
 			if row[COMPANY_NAME] == '':
 				ind_contacts.append(fill_individual_contract(row))
 				ind_donations.append(fill_donation(row))
@@ -86,28 +93,36 @@ def export(fileName, outputFolder):
 			else:
 				org_contacts.append(fill_organization_contract(row))
 				org_donations.append(fill_donation(row))
+
+	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
 	output_file(outputFolder + IND_DONATION_FILE, ind_donations)
 	output_file(outputFolder + ORG_CONTACT_FILE, org_contacts)
 	output_file(outputFolder + ORG_DONATION_FILE, org_donations)
+
+# Array filling functions ======================================================
 
 def fill_individual_contract(row):
 	""" Create a csv row for individual contact.
 
 	Argument:
 		row -- (Dictionary) the row extract data from
+	Return:    (Array)      a line for the csv file
 	"""
 	contact = []
 	contact.append(getField(row, EXTERNAL_ID))
+	# name
 	contact.append(getField(row, FORMAL_TITLE))
 	contact.append(getField(row, FIRST_NAME))
 	contact.append(getField(row, LAST_NAME))
+	# address
 	contact.append(getField(row, ADDRESS))
 	contact.append(getField(row, SUPPLEMENTAL_ADDRESS_1))
 	contact.append(getField(row, CITY))
 	contact.append(getField(row, STATE))
 	contact.append(getField(row, POSTAL_CODE))
 	contact.append(getField(row, COUNTRY))
+	# phone + email
 	contact.append(getField(row, PHONE))
 	contact.append(getField(row, EMAIL))
 	return contact
@@ -117,16 +132,19 @@ def fill_organization_contract(row):
 
 	Argument:
 		row -- (Dictionary) the row extract data from
+	Return:    (Array)      a line for the csv file
 	"""
 	contact = []
 	contact.append(getField(row, EXTERNAL_ID))
 	contact.append(getField(row, COMPANY_NAME))
+	# address
 	contact.append(getField(row, ADDRESS))
 	contact.append(getField(row, SUPPLEMENTAL_ADDRESS_1))
 	contact.append(getField(row, CITY))
 	contact.append(getField(row, STATE))
 	contact.append(getField(row, POSTAL_CODE))
 	contact.append(getField(row, COUNTRY))
+	# phone + email
 	contact.append(getField(row, PHONE))
 	contact.append(getField(row, EMAIL))
 	return contact
@@ -136,15 +154,16 @@ def fill_donation(row, external=""):
 
 	Argument:
 		row -- (Dictionary) the row extract data from
+	Return:    (Array)      a line for the csv file
 	"""
 	donation = []
 	donation.append(getField(row, EXTERNAL_ID, external))
 	donation.append(getField(row, INVOICE_NUMBER))
-
+	# amount - get number as string -> convert to float -> insert with format
 	amount_str = getField(row, TOTAL_AMOUNT, '0')
 	amount_float = float(amount_str)
 	donation.append("{:.2f}".format(amount_float))
-
+	# date - get date as string, try different formats
 	date_raw = getField(row, DATE_RECEIVED)
 	try:
 		date = datetime.datetime.strptime(date_raw, '%Y/%m/%d').strftime('%Y-%m-%d')
@@ -152,20 +171,30 @@ def fill_donation(row, external=""):
 		datetime.datetime.strptime(date_raw, "%Y-%m-%d")
 		date = date_raw
 	donation.append(date)
-
-	donation.append(getField(row, SOURCE))
+	# other exporting values
+	donation.append(getField(row, DONATION_SOURCE))
 	donation.append(getField(row, NOTE))
 	donation.append(FINANCIAL_TYPE)
 	return donation
 
+# Other Helper Functions========================================================
+
 def getField(row, field, default=""):
+	""" Gets the field
+
+	Argument:
+		row     -- (Dictionary) the row extract data from
+		field   -- (String)     the field name
+		default -- (String)     the default value
+	Return:        (String)     the value from the `row` dictionary
+	"""
 	if field in row:
 		ans = row[field]
-		if ans.upper() == ANON:
+		if ans.upper() == ANON: #CanadaHelps defualt value
 			return default
 		return ans
 	else:
-		print(field)
+		print ("Missing Field: \"" + field + "\". Exporting as \"" + defualt + "\".")
 		return default
 
 def output_file(fileName, items):
@@ -180,6 +209,7 @@ def output_file(fileName, items):
 		for item in items:
 			output.writerow(item)
 
+# Main Functions================================================================
 
 def main(argv):
 	""" The main method of this script
@@ -199,4 +229,5 @@ def main(argv):
 		print("Usage: python export.py ${canada_help_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
+	# Don't run if this file is imported by another pythong script
 	main(sys.argv[1:])
