@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """ Create a CSV to import into CiviCRM from CanadaHelps output CSV.
 
-Fields order or their existances are not an issue with this script. But *this*
+Fields order or their availability are not an issue with this script. But *this*
 *does not mean resulting csv file will import into CiviCRM successfully*.
 
 To use this python script run:
@@ -19,7 +19,9 @@ tr -d '\000' < ${problem_file}  > ${use_file}
 - All text with "Anon" will becomes empty. This is a mean to reduces errors
 - Anonoymous donation will go to the individual with "ANON" as the external id
 - Anonoymous will not add into the contact import file
--
+- If the field is not found or is "ANON", then field will be empty, except for
+  total amount, which will be 0.00
+- the date format can be either %Y/%m/%d '%Y-%m-%d'
 """
 
 import csv
