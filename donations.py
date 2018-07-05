@@ -115,7 +115,6 @@ def fill_individual_contract(row):
 	contact = []
 	contact.append(getField(row, EXTERNAL_ID))
 	# name
-	contact.append(getField(row, FORMAL_TITLE))
 	contact.append(getField(row, FIRST_NAME))
 	contact.append(getField(row, LAST_NAME))
 	# address
