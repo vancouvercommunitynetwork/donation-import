@@ -27,7 +27,6 @@ import datetime
 # Variable names are the name that the fields should import into
 
 # The values here are the files in the CanadaHelps csv file
-FORMAL_TITLE="DONOR TITLE"
 FIRST_NAME="DONOR FIRST NAME" #REQUIRED
 LAST_NAME="DONOR LAST NAME" #REQUIRED
 COMPANY_NAME="DONOR COMPANY NAME"
@@ -50,6 +49,7 @@ NOTE="MESSAGE TO CHARITY"
 
 # Values are the export value
 FINANCIAL_TYPE = "Donation" #REQUIRED
+PAYMENT_METHOD = "Credit Card"
 
 # Constants used in this file===================================================
 RE_ENCODED_FILE = "reencoded.csv"
@@ -115,7 +115,6 @@ def fill_individual_contract(row):
 	contact = []
 	contact.append(getField(row, EXTERNAL_ID))
 	# name
-	contact.append(getField(row, FORMAL_TITLE))
 	contact.append(getField(row, FIRST_NAME))
 	contact.append(getField(row, LAST_NAME))
 	# address
@@ -178,6 +177,7 @@ def fill_donation(row, external=""):
 	donation.append(getField(row, DONATION_SOURCE))
 	donation.append(getField(row, NOTE))
 	donation.append(FINANCIAL_TYPE)
+	donation.append(PAYMENT_METHOD)
 	return donation
 
 # Other Helper Functions========================================================
