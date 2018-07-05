@@ -27,8 +27,6 @@ import datetime
 # Variable names are the name that the fields should import into
 
 # The values here are the files in the CanadaHelps csv file
-# Constant names is the same name matching CiviCRM Field
-FORMAL_TITLE="DONOR TITLE"
 FIRST_NAME="DONOR FIRST NAME" #REQUIRED
 LAST_NAME="DONOR LAST NAME" #REQUIRED
 COMPANY_NAME="DONOR COMPANY NAME"
