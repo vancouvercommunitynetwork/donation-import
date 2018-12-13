@@ -16,12 +16,14 @@ python export.py ${canada_help_csv} ${export_folder}
 - If the field is not found or is "ANON", then field will be empty, except for
   total amount, which will be 0.00
 - the date format can be either %Y/%m/%d or %Y-%m-%d
-- header line is needed for the imporint CanadaHelps csv file
+- header line is needed for the importing CanadaHelps csv file
 """
 
+import os
 import csv
 import sys
 import datetime
+import tempfile
 
 # Fields to export==============================================================
 # Variable names are the name that the fields should import into
@@ -47,12 +49,11 @@ DATE_RECEIVED="DONATION DATE"
 DONATION_SOURCE="DONATION SOURCE"
 NOTE="MESSAGE TO CHARITY"
 
-# Values are the export value
+# Values used the export value
 FINANCIAL_TYPE = "Donation" #REQUIRED
 PAYMENT_METHOD = "Credit Card"
 
 # Constants used in this file===================================================
-RE_ENCODED_FILE = "reencoded.csv"
 IND_CONTACT_FILE = "/individual_contacts.csv"
 IND_DONATION_FILE = "/individual_donations.csv"
 ORG_CONTACT_FILE = "/organization_contacts.csv"
@@ -69,6 +70,8 @@ def export(fileName, outputFolder):
 		fileName     -- (String) the input csv file path
 		outputFolder -- (String) the output folder path
 	"""
+	if not(os.path.exists(outputFolder)):
+		os.makedirs(outputFolder)
 
 	# output list
 	ind_contacts = []
@@ -76,26 +79,26 @@ def export(fileName, outputFolder):
 	org_contacts = []
 	org_donations =[]
 
-	with open(fileName, 'rb') as csvFile: # open export file
-		with open(RE_ENCODED_FILE, 'wb') as encode: # open write file
+	with open(fileName, 'rb') as canadaHelp: # open export file
+		with tempfile.TemporaryFile() as csvFile: # open write file
 			# takes the export file and do the following things:
 			# - change the uncoding from utf-8 BOM to utf-8
 			# - remove all the null characters
 			# - save the file so the csv.DictReader can reopen it and read it
-			encode.write(csvFile.read().decode("utf-8-sig").encode("utf-8").replace('\x00', ''))
-
-	with open(RE_ENCODED_FILE, 'rb') as csvFile:
-		# exctract file into a dictionary
-		reader = csv.DictReader(csvFile)
-		for row in reader:
-			if row[COMPANY_NAME] == '':
-				ind_contacts.append(fill_individual_contract(row))
-				ind_donations.append(fill_donation(row))
-			elif row[COMPANY_NAME].upper() == ANON:
-				ind_donations.append(fill_donation(row, ANON))
-			else:
-				org_contacts.append(fill_organization_contract(row))
-				org_donations.append(fill_donation(row))
+			csvFile.write(canadaHelp.read().decode("utf-8-sig").encode("utf-8").replace('\x00', ''))
+			csvFile.seek(0)
+			
+			# exctract file into a dictionary
+			reader = csv.DictReader(csvFile)
+			for row in reader:
+				if row[COMPANY_NAME] == '':
+					ind_contacts.append(fill_individual_contract(row))
+					ind_donations.append(fill_donation(row))
+				elif row[COMPANY_NAME].upper() == ANON:
+					ind_donations.append(fill_donation(row, ANON))
+				else:
+					org_contacts.append(fill_organization_contract(row))
+					org_donations.append(fill_donation(row))
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
@@ -213,6 +216,10 @@ def output_file(fileName, items):
 		for item in items:
 			output.writerow(item)
 
+def today_date_folder():
+	today = datetime.date.today()
+	return today.strftime("%d-%m-%Y")
+
 # Main Functions================================================================
 
 def main(argv):
@@ -226,9 +233,9 @@ def main(argv):
 	if len(argv) == 2:
 		export(argv[0], argv[1])
 	elif len(argv) == 1:
-		export(argv[0], ".")
+		export(argv[0], today_date_folder())
 	elif len(argv) == 0:
-		export("CharityDataDownload.csv", ".")
+		export("CharityDataDownload.csv", today_date_folder())
 	else:
 		print("Usage: python export.py ${canada_help_csv} ${export_folder} # to store 4 files.")
 
