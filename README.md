@@ -15,7 +15,7 @@ python export.py ${canada_help_csv} ${export_folder}
 ~~~
 
 `${canada_help_csv}` and `${export_folder}` are optional and defualts 
-to `CharityDataDownload.csv` and today's day (with the format DD-MM-YYYY) 
+to `CharityDataDownload.csv` and today's day (with the format YYYY-MM-DD) 
 respectively.
 
 Import contacts into CiviCRM before importing donations. Please use the

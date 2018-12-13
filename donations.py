@@ -218,7 +218,7 @@ def output_file(fileName, items):
 
 def today_date_folder():
 	today = datetime.date.today()
-	return today.strftime("%d-%m-%Y")
+	return today.strftime("%Y-%m-%d")
 
 # Main Functions================================================================
 
