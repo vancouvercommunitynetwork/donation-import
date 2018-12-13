@@ -8,7 +8,7 @@ Python 3.
 Export csv from Canada Help. Keep the headings, and the column order does
 not matter.
 
-Run on of the following code:
+Run the following code:
 
 ~~~bash
 python export.py ${canada_help_csv} ${export_folder}
@@ -16,12 +16,10 @@ python export.py ${canada_help_csv} ${export_folder}
 
 `${canada_help_csv}` and `${export_folder}` are optional and defualts 
 to `CharityDataDownload.csv` and today's day (with the format DD-MM-YYYY) 
-respectively.
+respectively. The `${export_folder}` folder will be created as needed.
 
 Import contacts into CiviCRM before importing donations. Please use the
 mapping prefixed with "CanadaHelp".
-
-See [script] for more details.
 
 [script]:donations.py
 
@@ -42,7 +40,7 @@ See [script] for more details.
 	- export for Import Contact with the mapping "CanadaHelp Organizations"
 	- fields follows [Donation Table](#donation-table)
 
-## Individual Contact Table
+### Individual Contact Table
 
 |Civicrm Field         |Canada Help Field    |Required|
 |----------------------|---------------------|--------|
@@ -59,7 +57,7 @@ See [script] for more details.
 |EMAIL                 |DONOR EMAIL ADDRESS  |**YES** |
 
 
-## Organization Contact Table
+### Organization Contact Table
 
 |Civicrm Field         |Canada Help Field    |Required|
 |----------------------|---------------------|--------|
@@ -75,7 +73,7 @@ See [script] for more details.
 |EMAIL                 |DONOR EMAIL ADDRESS  |**YES** |
 
 
-## Donation Table
+### Donation Table
 
 |Civicrm Field  |Canada Help Field  |Required/Value|
 |---------------|-------------------|--------------|
@@ -95,7 +93,7 @@ See [script] for more details.
 - Anonoymous will not add into the contact import file
 - If the field is not found or is "ANON", then field will be empty, except for
   total amount, which will be 0.00
-- the date format can be either %Y/%m/%d or %Y-%m-%d
+- the date format can be either `%Y/%m/%d` or `%Y-%m-%d`
 - header line is needed for the importing CanadaHelps csv file
 
 # History of Changes 
