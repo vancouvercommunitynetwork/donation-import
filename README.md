@@ -8,20 +8,18 @@ Python 3.
 Export csv from Canada Help. Keep the headings, and the column order does
 not matter.
 
-Run on of the following code:
+Run the following code:
 
 ~~~bash
 python export.py ${canada_help_csv} ${export_folder}
 ~~~
 
 `${canada_help_csv}` and `${export_folder}` are optional and defualts 
-to `CharityDataDownload.csv` and today's day (with the format YYYY-MM-DD) 
-respectively.
+to `CharityDataDownload.csv` and today's day (with the format DD-MM-YYYY) 
+respectively. The `${export_folder}` folder will be created as needed.
 
 Import contacts into CiviCRM before importing donations. Please use the
 mapping prefixed with "CanadaHelp".
-
-See [script] for more details.
 
 [script]:donations.py
 
@@ -34,15 +32,15 @@ See [script] for more details.
 	- fields follows [Individual Contact Table](#individual-contact-table)
 - ${export_folder}/individual_donations.csv
 	- export for Import Contact with the mapping "CanadaHelp Individuals Donations"
-	- fields follows [Donation Table](#individual-contact-table)
+	- fields follows [Donation Table](#donation-table)
 - ${export_folder}/organization_contacts.csv
 	- export for Import Contact with the mapping "CanadaHelp Organizations"
-	- fields follows [Organization Contact Table](#individual-contact-table)
+	- fields follows [Organization Contact Table](#organization-contact-table)
 - ${export_folder}/organization_donations.csv
 	- export for Import Contact with the mapping "CanadaHelp Organizations"
-	- fields follows [Donation Table](#individual-contact-table)
+	- fields follows [Donation Table](#donation-table)
 
-## Individual Contact Table
+### Individual Contact Table
 
 |Civicrm Field         |Canada Help Field    |Required|
 |----------------------|---------------------|--------|
@@ -59,7 +57,7 @@ See [script] for more details.
 |EMAIL                 |DONOR EMAIL ADDRESS  |**YES** |
 
 
-## Organization Contact Table
+### Organization Contact Table
 
 |Civicrm Field         |Canada Help Field    |Required|
 |----------------------|---------------------|--------|
@@ -75,18 +73,18 @@ See [script] for more details.
 |EMAIL                 |DONOR EMAIL ADDRESS  |**YES** |
 
 
-## Donation Table
+### Donation Table
 
-|Civicrm Field         |Canada Help Field    |Required/Value|
-|----------------------|---------------------|--------------|
-|EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES**       |
-|INVOICE_NUMBER        |TRANSACTION NUMBER   |No            |
-|TOTAL_AMOUNT          |AMOUNT               |**YES**       |
-|DATE_RECEIVED         |DONATION DATE        |No            |
-|DONATION_SOURCE       |DONATION SOURCE      |No            |
-|NOTE                  |MESSAGE TO CHARITY   |No            |
-|*n/a*                 |FINANCIAL_TYPE       |`Donation`    |
-|*n/a*                 |PAYMENT_METHOD       |`Credit Card` |
+|Civicrm Field  |Canada Help Field  |Required/Value|
+|---------------|-------------------|--------------|
+|EXTERNAL_ID    |DONOR EMAIL ADDRESS|**YES**       |
+|INVOICE_NUMBER |TRANSACTION NUMBER |No            |
+|TOTAL_AMOUNT   |AMOUNT             |**YES**       |
+|DATE_RECEIVED  |DONATION DATE      |No            |
+|DONATION_SOURCE|DONATION SOURCE    |No            |
+|NOTE           |MESSAGE TO CHARITY |No            |
+|FINANCIAL_TYPE |*n/a*              |`Donation`    |
+|PAYMENT_METHOD |*n/a*              |`Credit Card` |
 
 ## Notes
 
@@ -95,7 +93,7 @@ See [script] for more details.
 - Anonoymous will not add into the contact import file
 - If the field is not found or is "ANON", then field will be empty, except for
   total amount, which will be 0.00
-- the date format can be either %Y/%m/%d or %Y-%m-%d
+- the date format can be either `%Y/%m/%d` or `%Y-%m-%d`
 - header line is needed for the importing CanadaHelps csv file
 
 # History of Changes 
