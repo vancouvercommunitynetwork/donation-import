@@ -34,13 +34,13 @@ See [script] for more details.
 	- fields follows [Individual Contact Table](#individual-contact-table)
 - ${export_folder}/individual_donations.csv
 	- export for Import Contact with the mapping "CanadaHelp Individuals Donations"
-	- fields follows [Donation Table](#individual-contact-table)
+	- fields follows [Donation Table](#donation-table)
 - ${export_folder}/organization_contacts.csv
 	- export for Import Contact with the mapping "CanadaHelp Organizations"
-	- fields follows [Organization Contact Table](#individual-contact-table)
+	- fields follows [Organization Contact Table](#organization-contact-table)
 - ${export_folder}/organization_donations.csv
 	- export for Import Contact with the mapping "CanadaHelp Organizations"
-	- fields follows [Donation Table](#individual-contact-table)
+	- fields follows [Donation Table](#donation-table)
 
 ## Individual Contact Table
 
@@ -77,16 +77,16 @@ See [script] for more details.
 
 ## Donation Table
 
-|Civicrm Field         |Canada Help Field    |Required/Value|
-|----------------------|---------------------|--------------|
-|EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES**       |
-|INVOICE_NUMBER        |TRANSACTION NUMBER   |No            |
-|TOTAL_AMOUNT          |AMOUNT               |**YES**       |
-|DATE_RECEIVED         |DONATION DATE        |No            |
-|DONATION_SOURCE       |DONATION SOURCE      |No            |
-|NOTE                  |MESSAGE TO CHARITY   |No            |
-|*n/a*                 |FINANCIAL_TYPE       |`Donation`    |
-|*n/a*                 |PAYMENT_METHOD       |`Credit Card` |
+|Civicrm Field  |Canada Help Field  |Required/Value|
+|---------------|-------------------|--------------|
+|EXTERNAL_ID    |DONOR EMAIL ADDRESS|**YES**       |
+|INVOICE_NUMBER |TRANSACTION NUMBER |No            |
+|TOTAL_AMOUNT   |AMOUNT             |**YES**       |
+|DATE_RECEIVED  |DONATION DATE      |No            |
+|DONATION_SOURCE|DONATION SOURCE    |No            |
+|NOTE           |MESSAGE TO CHARITY |No            |
+|FINANCIAL_TYPE |*n/a*              |`Donation`    |
+|PAYMENT_METHOD |*n/a*              |`Credit Card` |
 
 ## Notes
 
