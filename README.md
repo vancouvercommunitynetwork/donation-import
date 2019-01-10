@@ -1,8 +1,108 @@
-# donation-import
+# Donation Import from Canada Help
 
-## Used with python 2.7.6 and MySQL 5.6.28 - standard
+The [script] uses python. This can be either Python 2 or 
+Python 3.
 
-### History of Changes Since 1-12-2015 (DD-MM-YYYY format)
+## Steps
+
+Export csv from Canada Help. Keep the headings, and the column order does
+not matter.
+
+Run the following code:
+
+~~~bash
+python export.py ${canada_help_csv} ${export_folder}
+~~~
+
+`${canada_help_csv}` and `${export_folder}` are optional and defualts 
+to `CharityDataDownload.csv` and today's day (with the format DD-MM-YYYY) 
+respectively. The `${export_folder}` folder will be created as needed.
+
+Import contacts into CiviCRM before importing donations. Please use the
+mapping prefixed with "CanadaHelp".
+
+[script]:donations.py
+
+## Output CSV files
+
+- *temporary file*
+	- file used to fix CanadaHelp csv file format
+- ${export_folder}/individual_contacts.csv
+	- export for Import Contact with the mapping "CanadaHelp Individuals",
+	- fields follows [Individual Contact Table](#individual-contact-table)
+- ${export_folder}/individual_donations.csv
+	- export for Import Contact with the mapping "CanadaHelp Individuals Donations"
+	- fields follows [Donation Table](#donation-table)
+- ${export_folder}/organization_contacts.csv
+	- export for Import Contact with the mapping "CanadaHelp Organizations"
+	- fields follows [Organization Contact Table](#organization-contact-table)
+- ${export_folder}/organization_donations.csv
+	- export for Import Contact with the mapping "CanadaHelp Organizations"
+	- fields follows [Donation Table](#donation-table)
+
+### Individual Contact Table
+
+|Civicrm Field         |Canada Help Field    |Required|
+|----------------------|---------------------|--------|
+|EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES** |
+|FIRST_NAME            |DONOR FIRST NAME     |**YES** |
+|LAST_NAME             |DONOR LAST NAME      |**YES** |
+|ADDRESS               |DONOR ADDRESS 1      |No      |
+|SUPPLEMENTAL_ADDRESS_1|DONOR ADDRESS 2      |No      |
+|CITY                  |DONOR CITY           |No      |
+|STATE                 |DONOR PROVINCE/STATE |No      |
+|POSTAL_CODE           |DONOR POSTAL/ZIP CODE|No      |
+|COUNTRY               |DONOR COUNTRY        |No      |
+|PHONE                 |DONOR PHONE NUMBER   |No      |
+|EMAIL                 |DONOR EMAIL ADDRESS  |**YES** |
+
+
+### Organization Contact Table
+
+|Civicrm Field         |Canada Help Field    |Required|
+|----------------------|---------------------|--------|
+|EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES** |
+|COMPANY_NAME          |DONOR COMPANY NAME   |**YES** |
+|ADDRESS               |DONOR ADDRESS 1      |No      |
+|SUPPLEMENTAL_ADDRESS_1|DONOR ADDRESS 2      |No      |
+|CITY                  |DONOR CITY           |No      |
+|STATE                 |DONOR PROVINCE/STATE |No      |
+|POSTAL_CODE           |DONOR POSTAL/ZIP CODE|No      |
+|COUNTRY               |DONOR COUNTRY        |No      |
+|PHONE                 |DONOR PHONE NUMBER   |No      |
+|EMAIL                 |DONOR EMAIL ADDRESS  |**YES** |
+
+
+### Donation Table
+
+|Civicrm Field  |Canada Help Field  |Required/Value|
+|---------------|-------------------|--------------|
+|EXTERNAL_ID    |DONOR EMAIL ADDRESS|**YES**       |
+|INVOICE_NUMBER |TRANSACTION NUMBER |No            |
+|TOTAL_AMOUNT   |AMOUNT             |**YES**       |
+|DATE_RECEIVED  |DONATION DATE      |No            |
+|DONATION_SOURCE|DONATION SOURCE    |No            |
+|NOTE           |MESSAGE TO CHARITY |No            |
+|FINANCIAL_TYPE |*n/a*              |`Donation`    |
+|PAYMENT_METHOD |*n/a*              |`Credit Card` |
+
+## Notes
+
+- All text with "Anon" will becomes empty. This is a mean to reduces errors
+- Anonoymous donation will go to the individual with "ANON" as the external id
+- Anonoymous will not add into the contact import file
+- If the field is not found or is "ANON", then field will be empty, except for
+  total amount, which will be 0.00
+- the date format can be either `%Y/%m/%d` or `%Y-%m-%d`
+- header line is needed for the importing CanadaHelps csv file
+
+# History of Changes 
+
+Since Dec 13 2018
+- Remove the old files as it now not being used
+- Updated the `README.md` with new instuctions
+
+Since 1-12-2015 (DD-MM-YYYY format)
 - Issues Fixed
   - Duplicated entries related to same csv file
   - Time not able to insert correctly
@@ -14,34 +114,3 @@
     - if not vcn mail then LoginID will become the donator's email
     - if ANON will become 000
   - Saving Transaction ID (as Paper Receipt)
-## Getting Started
-- These install instruction tested with ubuntu 14.04 LTS - Results may vary
-  - Install python dev:
-    - sudo apt-get install python-dev
-  - MySQL Install
-    - Installing
-      - sudo apt-get update
-      - sudo apt-get install mysql-server
-      - sudo mysql_install_db
-  - Installing Python MySQL library
-      - enter this: sudo apt-get install python-mysql.connector
-      - then sudo apt-get python-mysqldb
-  - After Installing the important stuff:
-    - Add the database in MySQL
-    - importing an .sql file:mysql -u root -p Cheese<sql_file_name.sql
-    - in donation_imort.cfg, change these parameters to fix your mysql settings
-      - userName=root
-      - password=password
-      - dbName=Cheese
-    - To change the testing csv file
-      - csvFileName=csv_name_here.csv (csv_name_here = your csv file name)
-  - To launch the program just type: python main.py
-    - If there's a line 'Successful in adding transaction...' you have added all non-duplicate entries successfully
-    - If there are no outputs that's mean you use a already imported csv file
-    - If there are errors: either code error or something wrong with your config
-      - If 'No database connection yet...' appears something wrong with your MySQL config in donation_imort.cfg
-      - If 'Error in opening/reading CSV file. Check if file exists...' appears. Something wrong with your csv file config in  in donation_imort.cfg
-  - To delete the imported transaction just type:
-  ```
-  DELETE From Money_Brought_In WHERE `Paper Receipt` LIKE 'TR%' AND `For` = 'Credit Card';
-  ```
