@@ -3,6 +3,29 @@
 The [script] uses python. This can be either Python 2 or 
 Python 3.
 
+# Input CSV file
+
+The CSV file from Canada Help must have these columns.
+
+|Canada Help Field    |Required For                                                                                                                                             |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+|DONOR FIRST NAME     |[Individual Contact Table](#individual-contact-table)                                                                                                    |
+|DONOR LAST NAME      |[Individual Contact Table](#individual-contact-table)                                                                                                    |
+|DONOR COMPANY NAME   |[Organization Contact Table](#organization-contact-table)                                                                                                |
+|DONOR ADDRESS 1      |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR ADDRESS 2      |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR CITY           |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR PROVINCE/STATE |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR POSTAL/ZIP CODE|[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR COUNTRY        |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR PHONE NUMBER   |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR EMAIL ADDRESS  |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)<br/>[Donation Table](#donation-table)|
+|TRANSACTION NUMBER   |[Donation Table](#donation-table)                                                                                                                        |
+|AMOUNT               |[Donation Table](#donation-table)                                                                                                                        |
+|DONATION DATE        |[Donation Table](#donation-table)                                                                                                                        |
+|DONATION SOURCE      |[Donation Table](#donation-table)                                                                                                                        |
+|MESSAGE TO CHARITY   |[Donation Table](#donation-table)                                                                                                                        |
+
 ## Steps
 
 Export csv from Canada Help. Keep the headings, and the column order does
@@ -97,6 +120,9 @@ mapping prefixed with "CanadaHelp".
 - header line is needed for the importing CanadaHelps csv file
 
 # History of Changes 
+
+Since Jun 03 2022
+- Updated `README.md` with a table for input CSV file fields
 
 Since Dec 13 2018
 - Remove the old files as it now not being used
