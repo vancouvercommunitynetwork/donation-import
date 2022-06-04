@@ -52,12 +52,14 @@ NOTE="MESSAGE TO CHARITY"
 # Values used the export value
 FINANCIAL_TYPE = "Donation" #REQUIRED
 PAYMENT_METHOD = "Credit Card"
+MEMBERSHIP_TYPE = "VCN Member"
 
 # Constants used in this file===================================================
 IND_CONTACT_FILE = "/individual_contacts.csv"
 IND_DONATION_FILE = "/individual_donations.csv"
 ORG_CONTACT_FILE = "/organization_contacts.csv"
 ORG_DONATION_FILE = "/organization_donations.csv"
+MEMBERSHIP_FILE = "/memberships.csv"
 
 ANON="ANON"
 
@@ -77,7 +79,8 @@ def export(fileName, outputFolder):
 	ind_contacts = []
 	ind_donations = []
 	org_contacts = []
-	org_donations =[]
+	org_donations = []
+	memberships = []
 
 	with open(fileName, 'rb') as canadaHelp: # open export file
 		with tempfile.TemporaryFile() as csvFile: # open write file
@@ -99,12 +102,15 @@ def export(fileName, outputFolder):
 				else:
 					org_contacts.append(fill_organization_contract(row))
 					org_donations.append(fill_donation(row))
+				if float(row[TOTAL_AMOUNT]) >= 15:
+					memberships.append(fill_membership(row))
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
 	output_file(outputFolder + IND_DONATION_FILE, ind_donations)
 	output_file(outputFolder + ORG_CONTACT_FILE, org_contacts)
 	output_file(outputFolder + ORG_DONATION_FILE, org_donations)
+	output_file(outputFolder + MEMBERSHIP_FILE, memberships)
 
 # Array filling functions ======================================================
 
@@ -182,6 +188,25 @@ def fill_donation(row, external=""):
 	donation.append(FINANCIAL_TYPE)
 	donation.append(PAYMENT_METHOD)
 	return donation
+
+def fill_membership(row):
+	""" Create a csv row for membership.
+
+	Argument:
+		row -- (Dictionary) the row extract data from
+	Return:    (Array)      a line for the csv file
+	"""
+	membership = []
+	membership.append(getField(row, EXTERNAL_ID))
+	membership.append(MEMBERSHIP_TYPE)
+	# default to today's date
+	date_raw = getField(row, DATE_RECEIVED, datetime.date.today().strftime('%Y/%m/%d'))
+	try:
+		date = datetime.datetime.strptime(date_raw, '%Y/%m/%d').strftime('%Y-%m-%d')
+	except ValueError:
+		date = date_raw
+	membership.append(date)
+	return membership
 
 # Other Helper Functions========================================================
 
