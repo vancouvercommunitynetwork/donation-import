@@ -3,7 +3,7 @@
 The [script] uses python. This can be either Python 2 or 
 Python 3.
 
-# Input CSV file
+## Input CSV file
 
 The CSV file from Canada Help must have these columns.
 
