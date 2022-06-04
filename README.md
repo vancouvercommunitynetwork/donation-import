@@ -62,6 +62,9 @@ mapping prefixed with "CanadaHelps".
 - ${export_folder}/organization_donations.csv
 	- export for Import Contact with the mapping "CanadaHelps Organizations"
 	- fields follows [Donation Table](#donation-table)
+- ${export_folder}/memberships.csv
+	- export for Import Memberships with the mapping "CanadaHelps Donations"
+	- fields follows [Membership Table](#membership-table)
 
 ### Individual Contact Table
 
@@ -109,6 +112,15 @@ mapping prefixed with "CanadaHelps".
 |FINANCIAL_TYPE |*n/a*              |`Donation`    |
 |PAYMENT_METHOD |*n/a*              |`Credit Card` |
 
+
+### Membership Table
+
+|CiviCRM Field        |CanadaHelps Field  |Required/Value|
+|---------------------|-------------------|--------------|
+|EXTERNAL_ID          |DONOR EMAIL ADDRESS|**YES**       |
+|MEMBERSHIP_TYPE      |AMOUNT             |`VCN Member`  |
+|MEMBERSHIP_START_DATE|DONATION DATE      |No            |
+
 ## Notes
 
 - All text with "Anon" will becomes empty. This is a mean to reduces errors
@@ -120,6 +132,9 @@ mapping prefixed with "CanadaHelps".
 - header line is needed for the importing CanadaHelps csv file
 
 # History of Changes 
+
+Since Jun 13 2022
+- Added logic and documentation for membership CSV export
 
 Since Jun 03 2022
 - Updated `README.md` with a table for input CSV file fields
