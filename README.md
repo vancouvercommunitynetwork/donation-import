@@ -7,7 +7,7 @@ Python 3.
 
 The CSV file from CanadaHelps must have these columns.
 
-|CanadaHelps Field    |Required For                                                                                                                                             |
+|CanadaHelp Field    |Required For                                                                                                                                             |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 |DONOR FIRST NAME     |[Individual Contact Table](#individual-contact-table)                                                                                                    |
 |DONOR LAST NAME      |[Individual Contact Table](#individual-contact-table)                                                                                                    |
