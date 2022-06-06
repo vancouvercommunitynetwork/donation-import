@@ -5,9 +5,9 @@ Python 3.
 
 ## Input CSV file
 
-The CSV file from Canada Help must have these columns.
+The CSV file from CanadaHelps must have these columns.
 
-|Canada Help Field    |Required For                                                                                                                                             |
+|CanadaHelps Field    |Required For                                                                                                                                             |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
 |DONOR FIRST NAME     |[Individual Contact Table](#individual-contact-table)                                                                                                    |
 |DONOR LAST NAME      |[Individual Contact Table](#individual-contact-table)                                                                                                    |
@@ -28,7 +28,7 @@ The CSV file from Canada Help must have these columns.
 
 ## Steps
 
-Export csv from Canada Help. Keep the headings, and the column order does
+Export csv from CanadaHelps. Keep the headings, and the column order does
 not matter.
 
 Run the following code:
@@ -65,7 +65,7 @@ mapping prefixed with "CanadaHelps".
 
 ### Individual Contact Table
 
-|CiviCRM Field         |Canada Help Field    |Required|
+|CiviCRM Field         |CanadaHelps Field    |Required|
 |----------------------|---------------------|--------|
 |EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES** |
 |FIRST_NAME            |DONOR FIRST NAME     |**YES** |
@@ -82,7 +82,7 @@ mapping prefixed with "CanadaHelps".
 
 ### Organization Contact Table
 
-|CiviCRM Field         |Canada Help Field    |Required|
+|CiviCRM Field         |CanadaHelps Field    |Required|
 |----------------------|---------------------|--------|
 |EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES** |
 |COMPANY_NAME          |DONOR COMPANY NAME   |**YES** |
@@ -98,7 +98,7 @@ mapping prefixed with "CanadaHelps".
 
 ### Donation Table
 
-|CiviCRM Field  |Canada Help Field  |Required/Value|
+|CiviCRM Field  |CanadaHelps Field  |Required/Value|
 |---------------|-------------------|--------------|
 |EXTERNAL_ID    |DONOR EMAIL ADDRESS|**YES**       |
 |INVOICE_NUMBER |TRANSACTION NUMBER |No            |
