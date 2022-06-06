@@ -42,25 +42,25 @@ to `CharityDataDownload.csv` and today's day (with the format DD-MM-YYYY)
 respectively. The `${export_folder}` folder will be created as needed.
 
 Import contacts into CiviCRM before importing donations. Please use the
-mapping prefixed with "CanadaHelp".
+mapping prefixed with "CanadaHelps".
 
 [script]:donations.py
 
 ## Output CSV files
 
 - *temporary file*
-	- file used to fix CanadaHelp csv file format
+	- file used to fix CanadaHelps csv file format
 - ${export_folder}/individual_contacts.csv
-	- export for Import Contact with the mapping "CanadaHelp Individuals",
+	- export for Import Contact with the mapping "CanadaHelps Individuals",
 	- fields follows [Individual Contact Table](#individual-contact-table)
 - ${export_folder}/individual_donations.csv
-	- export for Import Contact with the mapping "CanadaHelp Individuals Donations"
+	- export for Import Contact with the mapping "CanadaHelps Individuals Donations"
 	- fields follows [Donation Table](#donation-table)
 - ${export_folder}/organization_contacts.csv
-	- export for Import Contact with the mapping "CanadaHelp Organizations"
+	- export for Import Contact with the mapping "CanadaHelps Organizations"
 	- fields follows [Organization Contact Table](#organization-contact-table)
 - ${export_folder}/organization_donations.csv
-	- export for Import Contact with the mapping "CanadaHelp Organizations"
+	- export for Import Contact with the mapping "CanadaHelps Organizations"
 	- fields follows [Donation Table](#donation-table)
 
 ### Individual Contact Table
