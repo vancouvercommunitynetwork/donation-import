@@ -3,6 +3,29 @@
 The [script] uses python. This can be either Python 2 or 
 Python 3.
 
+## Input CSV file
+
+The CSV file from Canada Help must have these columns.
+
+|Canada Help Field    |Required For                                                                                                                                             |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+|DONOR FIRST NAME     |[Individual Contact Table](#individual-contact-table)                                                                                                    |
+|DONOR LAST NAME      |[Individual Contact Table](#individual-contact-table)                                                                                                    |
+|DONOR COMPANY NAME   |[Organization Contact Table](#organization-contact-table)                                                                                                |
+|DONOR ADDRESS 1      |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR ADDRESS 2      |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR CITY           |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR PROVINCE/STATE |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR POSTAL/ZIP CODE|[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR COUNTRY        |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR PHONE NUMBER   |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)                                      |
+|DONOR EMAIL ADDRESS  |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)<br/>[Donation Table](#donation-table)|
+|TRANSACTION NUMBER   |[Donation Table](#donation-table)                                                                                                                        |
+|AMOUNT               |[Donation Table](#donation-table)                                                                                                                        |
+|DONATION DATE        |[Donation Table](#donation-table)                                                                                                                        |
+|DONATION SOURCE      |[Donation Table](#donation-table)                                                                                                                        |
+|MESSAGE TO CHARITY   |[Donation Table](#donation-table)                                                                                                                        |
+
 ## Steps
 
 Export csv from Canada Help. Keep the headings, and the column order does
@@ -14,7 +37,7 @@ Run the following code:
 python export.py ${canada_help_csv} ${export_folder}
 ~~~
 
-`${canada_help_csv}` and `${export_folder}` are optional and defualts 
+`${canada_help_csv}` and `${export_folder}` are optional and default 
 to `CharityDataDownload.csv` and today's day (with the format DD-MM-YYYY) 
 respectively. The `${export_folder}` folder will be created as needed.
 
@@ -42,7 +65,7 @@ mapping prefixed with "CanadaHelp".
 
 ### Individual Contact Table
 
-|Civicrm Field         |Canada Help Field    |Required|
+|CiviCRM Field         |Canada Help Field    |Required|
 |----------------------|---------------------|--------|
 |EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES** |
 |FIRST_NAME            |DONOR FIRST NAME     |**YES** |
@@ -59,7 +82,7 @@ mapping prefixed with "CanadaHelp".
 
 ### Organization Contact Table
 
-|Civicrm Field         |Canada Help Field    |Required|
+|CiviCRM Field         |Canada Help Field    |Required|
 |----------------------|---------------------|--------|
 |EXTERNAL_ID           |DONOR EMAIL ADDRESS  |**YES** |
 |COMPANY_NAME          |DONOR COMPANY NAME   |**YES** |
@@ -75,7 +98,7 @@ mapping prefixed with "CanadaHelp".
 
 ### Donation Table
 
-|Civicrm Field  |Canada Help Field  |Required/Value|
+|CiviCRM Field  |Canada Help Field  |Required/Value|
 |---------------|-------------------|--------------|
 |EXTERNAL_ID    |DONOR EMAIL ADDRESS|**YES**       |
 |INVOICE_NUMBER |TRANSACTION NUMBER |No            |
@@ -89,8 +112,8 @@ mapping prefixed with "CanadaHelp".
 ## Notes
 
 - All text with "Anon" will becomes empty. This is a mean to reduces errors
-- Anonoymous donation will go to the individual with "ANON" as the external id
-- Anonoymous will not add into the contact import file
+- Anonymous donation will go to the individual with "ANON" as the external id
+- Anonymous will not add into the contact import file
 - If the field is not found or is "ANON", then field will be empty, except for
   total amount, which will be 0.00
 - the date format can be either `%Y/%m/%d` or `%Y-%m-%d`
@@ -98,9 +121,13 @@ mapping prefixed with "CanadaHelp".
 
 # History of Changes 
 
+Since Jun 03 2022
+- Updated `README.md` with a table for input CSV file fields
+- Fixed spelling errors in `README.md`
+
 Since Dec 13 2018
 - Remove the old files as it now not being used
-- Updated the `README.md` with new instuctions
+- Updated the `README.md` with new instructions
 
 Since 1-12-2015 (DD-MM-YYYY format)
 - Issues Fixed
