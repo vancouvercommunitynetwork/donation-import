@@ -201,11 +201,11 @@ def fill_membership(row):
 	membership.append(getField(row, EXTERNAL_ID))
 	membership.append(MEMBERSHIP_TYPE)
 	# default to today's date
-	date_raw = getField(row, DATE_RECEIVED, datetime.date.today().strftime('%Y/%m/%d'))
+	date = getField(row, DATE_RECEIVED, datetime.date.today().strftime('%Y/%m/%d'))
 	try:
-		date = datetime.datetime.strptime(date_raw, '%Y/%m/%d').strftime('%Y-%m-%d')
+		date = datetime.datetime.strptime(date, '%Y/%m/%d').strftime('%Y-%m-%d')
 	except ValueError:
-		date = date_raw
+		pass
 	membership.append(date)
 	return membership
 
