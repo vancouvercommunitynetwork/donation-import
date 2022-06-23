@@ -22,7 +22,7 @@ The CSV file from CanadaHelps must have these columns.
 |DONOR EMAIL ADDRESS  |[Individual Contact Table](#individual-contact-table)<br/>[Organization Contact Table](#organization-contact-table)<br/>[Donation Table](#donation-table)|
 |TRANSACTION NUMBER   |[Donation Table](#donation-table)                                                                                                                        |
 |AMOUNT               |[Donation Table](#donation-table)                                                                                                                        |
-|DONATION DATE        |[Donation Table](#donation-table)                                                                                                                        |
+|DONATION DATE        |[Donation Table](#donation-table)<br/>[Membership Table](#membership-table)                                                                              |
 |DONATION SOURCE      |[Donation Table](#donation-table)                                                                                                                        |
 |MESSAGE TO CHARITY   |[Donation Table](#donation-table)                                                                                                                        |
 
