@@ -62,6 +62,7 @@ ORG_DONATION_FILE = "/organization_donations.csv"
 MEMBERSHIP_FILE = "/memberships.csv"
 
 ANON="ANON"
+MEMBERSHIP_MIN_AMOUNT = 15
 
 # Main export function==========================================================
 
@@ -102,7 +103,7 @@ def export(fileName, outputFolder):
 				else:
 					org_contacts.append(fill_organization_contract(row))
 					org_donations.append(fill_donation(row))
-				if float(row[TOTAL_AMOUNT]) >= 15:
+				if float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
 					memberships.append(fill_membership(row))
 
 	# output files
