@@ -64,6 +64,9 @@ MEMBERSHIP_FILE = "/memberships.csv"
 ANON="ANON"
 MEMBERSHIP_MIN_AMOUNT = 15
 
+INPUT_DATE_FORMATS = ['%Y/%m/%d', '%Y-%m-%d']
+OUTPUT_DATE_FORMAT = '%Y-%m-%d'
+
 # Main export function==========================================================
 
 def export(fileName, outputFolder):
@@ -176,12 +179,7 @@ def fill_donation(row, external=""):
 	amount_float = float(amount_str)
 	donation.append("{:.2f}".format(amount_float))
 	# date - get date as string, try different formats
-	date_raw = getField(row, DATE_RECEIVED)
-	try:
-		date = datetime.datetime.strptime(date_raw, '%Y/%m/%d').strftime('%Y-%m-%d')
-	except ValueError:
-		datetime.datetime.strptime(date_raw, "%Y-%m-%d")
-		date = date_raw
+	date = convert_date(getField(row, DATE_RECEIVED))
 	donation.append(date)
 	# other exporting values
 	donation.append(getField(row, DONATION_SOURCE))
@@ -200,12 +198,7 @@ def fill_membership(row):
 	membership = []
 	membership.append(getField(row, EXTERNAL_ID))
 	membership.append(MEMBERSHIP_TYPE)
-	# default to today's date
-	date = getField(row, DATE_RECEIVED, datetime.date.today().strftime('%Y/%m/%d'))
-	try:
-		date = datetime.datetime.strptime(date, '%Y/%m/%d').strftime('%Y-%m-%d')
-	except ValueError:
-		pass
+	date = convert_date(getField(row, DATE_RECEIVED))
 	membership.append(date)
 	return membership
 
@@ -245,6 +238,24 @@ def output_file(fileName, items):
 def today_date_folder():
 	today = datetime.date.today()
 	return today.strftime("%Y-%m-%d")
+
+def convert_date(input_date_str):
+	""" Convert a date string from the input file into a date string for the output file
+
+	Argument:
+		input_date_str -- (String)     the date string from the input fileName
+	Return:               (String)     the date string to be used for the output file
+	"""
+	for input_format in INPUT_DATE_FORMATS:
+		try:
+			input_date = datetime.datetime.strptime(input_date_str, input_format)
+			# stop if the format matched
+			break
+		except ValueError:
+			# move on to the next format
+			pass
+	output_date_str = input_date.strftime(OUTPUT_DATE_FORMAT)
+	return output_date_str
 
 # Main Functions================================================================
 
