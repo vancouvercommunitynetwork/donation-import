@@ -106,7 +106,7 @@ def export(fileName, outputFolder):
 				else:
 					org_contacts.append(fill_organization_contract(row))
 					org_donations.append(fill_donation(row))
-				if float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+				if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
 					memberships.append(fill_membership(row))
 
 	# output files
