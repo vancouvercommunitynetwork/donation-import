@@ -10,7 +10,7 @@ python export.py ${paypal_csv} ${export_folder}
 ~~~
 
 #Other info
-- (TODO tbd) the date format can be either %Y/%m/%d or %Y-%m-%d
+- the date format seems to be %d/%m/%Y
 - header line is needed for the importing PayPal csv file
 """
 
@@ -18,7 +18,7 @@ import os
 import csv
 import sys
 import datetime
-# import tempfile
+import tempfile
 
 # Fields to export==============================================================
 # Variable names are the name that the fields should import into
@@ -42,7 +42,7 @@ EXTERNAL_ID="Donor Email" #REQUIRED
 
 # Values used the export value
 FINANCIAL_TYPE = "Donation" #REQUIRED
-PAYMENT_METHOD = "Credit Card"
+PAYMENT_METHOD = "PayPal"
 MEMBERSHIP_TYPE = "VCN Member"
 
 # Constants used in this file===================================================
@@ -52,7 +52,7 @@ MEMBERSHIP_FILE = "/memberships.csv"
 
 MEMBERSHIP_MIN_AMOUNT = 15
 
-INPUT_DATE_FORMATS = ['%Y/%m/%d', '%Y-%m-%d']
+INPUT_DATE_FORMATS = ['%d/%m/%Y']
 OUTPUT_DATE_FORMAT = '%Y-%m-%d'
 
 # Main export function==========================================================
@@ -73,15 +73,21 @@ def export(fileName, outputFolder):
 	memberships = []
 
 	with open(fileName, 'rb') as ppFile: # open export file
-		# TODO assume default encoding for now
+		with tempfile.TemporaryFile() as csvFile: # open write file
+			# takes the export file and do the following things:
+			# - change the uncoding from utf-8 BOM to utf-8
+			# - remove all the null characters
+			# - save the file so the csv.DictReader can reopen it and read it
+			csvFile.write(ppFile.read().decode("utf-8-sig").encode("utf-8").replace('\x00', ''))
+			csvFile.seek(0)
 
-		# exctract file into a dictionary
-		reader = csv.DictReader(ppFile)
-		for row in reader:
-			ind_contacts.append(fill_individual_contract(row))
-			ind_donations.append(fill_donation(row))
-			if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-				memberships.append(fill_membership(row))
+			# exctract file into a dictionary
+			reader = csv.DictReader(csvFile)
+			for row in reader:
+				ind_contacts.append(fill_individual_contract(row))
+				ind_donations.append(fill_donation(row))
+				if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+					memberships.append(fill_membership(row))
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
