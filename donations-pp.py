@@ -18,7 +18,6 @@ import os
 import csv
 import sys
 import datetime
-import tempfile
 
 # Fields to export==============================================================
 # Variable names are the name that the fields should import into
@@ -72,22 +71,17 @@ def export(fileName, outputFolder):
 	ind_donations = []
 	memberships = []
 
-	with open(fileName, 'rb') as ppFile: # open export file
-		with tempfile.TemporaryFile() as csvFile: # open write file
-			# takes the export file and do the following things:
-			# - change the uncoding from utf-8 BOM to utf-8
-			# - remove all the null characters
-			# - save the file so the csv.DictReader can reopen it and read it
-			csvFile.write(ppFile.read().decode("utf-8-sig").encode("utf-8").replace('\x00', ''))
-			csvFile.seek(0)
+	# open the export file as a text file of given encoding
+	# (and implicitly convert to utf-8 in python)
+	with open(fileName, mode='r', encoding='utf-8-sig') as ppFile:
 
-			# exctract file into a dictionary
-			reader = csv.DictReader(csvFile)
-			for row in reader:
-				ind_contacts.append(fill_individual_contract(row))
-				ind_donations.append(fill_donation(row))
-				if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-					memberships.append(fill_membership(row))
+		# exctract file into a dictionary
+		reader = csv.DictReader(ppFile)
+		for row in reader:
+			ind_contacts.append(fill_individual_contract(row))
+			ind_donations.append(fill_donation(row))
+			if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+				memberships.append(fill_membership(row))
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
@@ -173,7 +167,8 @@ def output_file(fileName, items):
 		fileName -- (String) the csv file path
 		items    -- (List)   list of items to export
 	"""
-	with open(fileName, 'wb') as csvFile:
+	# open the file for writing as text file
+	with open(fileName, 'w', encoding='utf-8') as csvFile:
 		output = csv.writer(csvFile)
 		for item in items:
 			output.writerow(item)
