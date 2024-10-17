@@ -73,7 +73,7 @@ def export(fileName, outputFolder):
 
 	# open the export file as a text file of given encoding
 	# (and implicitly convert to utf-8 in python)
-	with open(fileName, mode='r', encoding='utf-8-sig') as ppFile:
+	with open(fileName, mode='r', encoding='ascii') as ppFile:
 
 		# exctract file into a dictionary
 		reader = csv.DictReader(ppFile)
