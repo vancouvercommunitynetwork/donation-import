@@ -84,5 +84,5 @@ mapping prefixed with "PayPal".
 
 ## Notes
 
-- the date format is `%d/%m/%Y` (although it may be different)
+- the date format can be either `%Y/%m/%d` or `%Y-%m-%d`
 - header line is needed for the importing PayPal csv file
