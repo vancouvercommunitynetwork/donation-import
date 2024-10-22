@@ -51,7 +51,7 @@ MEMBERSHIP_FILE = "/memberships.csv"
 
 MEMBERSHIP_MIN_AMOUNT = 15
 
-INPUT_DATE_FORMATS = ['%d/%m/%Y']
+INPUT_DATE_FORMATS = ['%Y/%m/%d', '%Y-%m-%d']
 OUTPUT_DATE_FORMAT = '%Y-%m-%d'
 
 # Main export function==========================================================
@@ -73,7 +73,8 @@ def export(fileName, outputFolder):
 
 	# open the export file as a text file of given encoding
 	# (and implicitly convert to utf-8 in python)
-	with open(fileName, mode='r', encoding='ascii') as ppFile:
+	# tentatively use 'ansi' as it's also a commonly used ascii superset
+	with open(fileName, mode='r', encoding='ansi') as ppFile:
 
 		# exctract file into a dictionary
 		reader = csv.DictReader(ppFile)
