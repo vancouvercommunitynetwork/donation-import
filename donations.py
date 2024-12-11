@@ -86,28 +86,21 @@ def export(fileName, outputFolder):
 	org_donations = []
 	memberships = []
 
-	with open(fileName, 'rb') as canadaHelp: # open export file
-		with tempfile.TemporaryFile() as csvFile: # open write file
-			# takes the export file and do the following things:
-			# - change the uncoding from utf-8 BOM to utf-8
-			# - remove all the null characters
-			# - save the file so the csv.DictReader can reopen it and read it
-			csvFile.write(canadaHelp.read().decode("utf-8-sig").encode("utf-8").replace('\x00', ''))
-			csvFile.seek(0)
-			
-			# exctract file into a dictionary
-			reader = csv.DictReader(csvFile)
-			for row in reader:
-				if row[COMPANY_NAME] == '':
-					ind_contacts.append(fill_individual_contract(row))
-					ind_donations.append(fill_donation(row))
-				elif row[COMPANY_NAME].upper() == ANON:
-					ind_donations.append(fill_donation(row, ANON))
-				else:
-					org_contacts.append(fill_organization_contract(row))
-					org_donations.append(fill_donation(row))
-				if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-					memberships.append(fill_membership(row))
+	with open(fileName, 'r', encoding='utf-16-le') as csvFile: # open export file
+
+		# exctract file into a dictionary
+		reader = csv.DictReader(csvFile)
+		for row in reader:
+			if row[COMPANY_NAME] == '':
+				ind_contacts.append(fill_individual_contract(row))
+				ind_donations.append(fill_donation(row))
+			elif row[COMPANY_NAME].upper() == ANON:
+				ind_donations.append(fill_donation(row, ANON))
+			else:
+				org_contacts.append(fill_organization_contract(row))
+				org_donations.append(fill_donation(row))
+			if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+				memberships.append(fill_membership(row))
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
@@ -230,7 +223,7 @@ def output_file(fileName, items):
 		fileName -- (String) the csv file path
 		items    -- (List)   list of items to export
 	"""
-	with open(fileName, 'wb') as csvFile:
+	with open(fileName, 'w', encoding='utf-8') as csvFile:
 		output = csv.writer(csvFile)
 		for item in items:
 			output.writerow(item)
