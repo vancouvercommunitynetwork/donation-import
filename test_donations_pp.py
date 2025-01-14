@@ -63,6 +63,17 @@ class TestDonationsPP(unittest.TestCase):
         expected = ["john.doe@example.com", "TXN123", "50.00", "2024-01-01", "Donation", "PayPal"]
         self.assertEqual(fill_donation(row), expected)
 
+    def test_fill_donation_zero_amount(self):
+        """Test case for a $0 donation"""
+        row = {
+            "Donor Email": "john.doe@example.com",
+            "Transaction ID": "TXN456",
+            "Gross Amount": "0",
+            "Donation Date": "2024/01/01"
+        }
+        expected = ["john.doe@example.com", "TXN456", "0.00", "2024-01-01", "Donation", "PayPal"]
+        self.assertEqual(fill_donation(row), expected)
+
     # Test fill_membership function
     def test_fill_membership(self):
         row = {
