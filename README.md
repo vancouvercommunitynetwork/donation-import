@@ -34,7 +34,7 @@ not matter.
 Run the following code:
 
 ~~~bash
-python export.py ${canada_help_csv} ${export_folder}
+python donations.py ${canada_help_csv} ${export_folder}
 ~~~
 
 `${canada_help_csv}` and `${export_folder}` are optional and default 
