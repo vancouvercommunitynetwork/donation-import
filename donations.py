@@ -6,7 +6,7 @@ Fields order or their availability are not an issue with this script. But *this*
 
 To use this python script run:
 ~~~bash
-python export.py ${canada_help_csv} ${export_folder}
+python donations.py ${canada_help_csv} ${export_folder}
 ~~~
 
 #Other info
