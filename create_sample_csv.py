@@ -1,5 +1,6 @@
 import csv
 import sys
+import donations
 
 # These fields are the expected fields from an input CanadaHelps CSV file
 # copied from donations.py to maintain consistency
@@ -35,24 +36,36 @@ def create_sample_csv(filename):
         COUNTRY, PHONE, EMAIL, INVOICE_NUMBER, TOTAL_AMOUNT, DATE_RECEIVED, DONATION_SOURCE, NOTE]
 
     # Sample hard coded data for both individual and company to test exporting
-    sample_data_individual = ['Johnson', 'Doe', '', '1234 Johnson St', '2345 Johnson Ave', 'Burnaby', 'BC', 'V1A 2A2',
-        'Canada', '555-555-5555', 'johntestdoe@gmail.com', '123456789', '1000.00', '2024-03-04', 'charity', "good luck"]
-    sample_data_company = ['Albert', 'Smith', 'BestCompanyBC', '1 Smith St', '2 Smith Ave', 'Vancouver', 'BC', 'V2B 3B3',
-        'USA', '604-123-4567', 'bestcompanyBC@gmail.com', '123456789', '500.00', '2024-03-05', 'company place', "cheers!"]
+    
+    data = [
+        ['Julian','Rogers','','1088 Cambie St','','Vancouver','British Columbia','V6B 6J5','Canada','604-721-9356',
+         'rogers@hotmail.com','123456789123','50','2025-01-14','Canadian Red Cross','donating to a worthy cause'],
+         ['Richard','Bennett','','555 Columbia Street','502 Columbia Street','New Westminster','British Columbia','V3L 1B2','Canada',
+          '604-525-5411','rbennett@gmail.com','308561985234','25.45','2024/12/15','World Vision Canada','cheers!'],
+         ['Matthew','Ward','AlbertaCompany','899 Centre Street SW','35 Crowfoot Terrace NW #35','Calgary','Alberta','T2G 1B8','Canada',
+          '403-264-8990','mattw_co@gmail.com','639286019723','90.5','2025/02/11','','sending money to help those in need'],
+         ['Abigail','Hughes','OntarioCompany','2041 Winston Park Dr','','Oakville','Ontario','L6H 6P5','Canada','289-813-2239',
+          'abih_co@gmail.com','184619263841','110','2025-02-20','','donating to help someone out :)']
+    ]
     
     # Creating a sample file with hardcoded data
     with open(filename, 'w', newline='', encoding='utf-16-le') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(input_field_names)
-        writer.writerow(sample_data_individual)
-        writer.writerow(sample_data_company)
+        writer.writerows(data)
 
 def main(argv):	    
+
+    # If header field names are not correctly named then any information in that column will be blank on export.
+
     # If there is no arguments provided then a sample csv will be called "sample_canada_helps_csv.csv"
     if len(argv) == 1:
          create_sample_csv(argv[0])
     elif len(argv) == 0:
-         create_sample_csv("sample_canada_helps_csv.csv")
+         create_sample_csv("Sample CanadaHelps Input CSV.csv")
+
+    donations.export("Sample CanadaHelps Input CSV.csv", "test")
+    
 
 if __name__ == "__main__":
     main(sys.argv[1:])
