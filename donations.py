@@ -19,6 +19,8 @@ python donations.py ${canada_help_csv} ${export_folder}
 - header line is needed for the importing CanadaHelps csv file
 """
 
+from charset_normalizer import from_path
+
 import os
 import csv
 import sys
@@ -101,6 +103,20 @@ def export(fileName, outputFolder):
 				org_donations.append(fill_donation(row))
 			if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
 				memberships.append(fill_membership(row))
+
+	'''normalized_input = normalizeInput(fileName)
+	for row in normalized_input:
+		if row[COMPANY_NAME] == '':
+			ind_contacts.append(fill_individual_contract(row))
+			ind_donations.append(fill_donation(row))
+		elif row[COMPANY_NAME].upper() == ANON:
+			ind_donations.append(fill_donation(row, ANON))
+		else:
+			org_contacts.append(fill_organization_contract(row))
+			org_donations.append(fill_donation(row))
+		if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+			memberships.append(fill_membership(row))'''
+
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
@@ -196,6 +212,21 @@ def fill_membership(row):
 	return membership
 
 # Other Helper Functions========================================================
+
+def normalizeInput(fileName):
+	""" Normalizes the encoding of the input to utf-8
+
+	Argument:
+		fileName -- (String) 	the csv file path
+	Return:			(List) 		the normalized input as a dictionary
+	"""
+	charset_result = from_path(fileName).best()
+	normalized_input = str(charset_result)
+	normalized_list = normalized_input.splitlines()
+
+	# TODO: find out correct way to turn the string/list into a dict
+
+	return normalized_list
 
 def getField(row, field, default=""):
 	""" Gets the field
