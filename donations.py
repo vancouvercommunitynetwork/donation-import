@@ -88,24 +88,11 @@ def export(fileName, outputFolder):
 	org_donations = []
 	memberships = []
 
-	with open(fileName, 'r', encoding='utf-16-le') as csvFile: # open export file
+	# Get the input normalized into a list before reading it into dictionary
+	normalized_input = normalizeInput(fileName)
 
-		# exctract file into a dictionary
-		reader = csv.DictReader(csvFile)
-		for row in reader:
-			if row[COMPANY_NAME] == '':
-				ind_contacts.append(fill_individual_contract(row))
-				ind_donations.append(fill_donation(row))
-			elif row[COMPANY_NAME].upper() == ANON:
-				ind_donations.append(fill_donation(row, ANON))
-			else:
-				org_contacts.append(fill_organization_contract(row))
-				org_donations.append(fill_donation(row))
-			if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-				memberships.append(fill_membership(row))
-
-	'''normalized_input = normalizeInput(fileName)
-	for row in normalized_input:
+	reader = csv.DictReader(normalized_input)
+	for row in reader:
 		if row[COMPANY_NAME] == '':
 			ind_contacts.append(fill_individual_contract(row))
 			ind_donations.append(fill_donation(row))
@@ -115,7 +102,7 @@ def export(fileName, outputFolder):
 			org_contacts.append(fill_organization_contract(row))
 			org_donations.append(fill_donation(row))
 		if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-			memberships.append(fill_membership(row))'''
+			memberships.append(fill_membership(row))
 
 
 	# output files
@@ -214,17 +201,15 @@ def fill_membership(row):
 # Other Helper Functions========================================================
 
 def normalizeInput(fileName):
-	""" Normalizes the encoding of the input to utf-8
+	""" Normalizes the encoding of the input to a standard encoding
 
 	Argument:
 		fileName -- (String) 	the csv file path
-	Return:			(List) 		the normalized input as a dictionary
+	Return:			(List) 		the normalized input as a list
 	"""
 	charset_result = from_path(fileName).best()
 	normalized_input = str(charset_result)
 	normalized_list = normalized_input.splitlines()
-
-	# TODO: find out correct way to turn the string/list into a dict
 
 	return normalized_list
 
@@ -301,5 +286,5 @@ def main(argv):
 		print("Usage: python export.py ${canada_help_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
-	# Don't run if this file is imported by another pythong script
+	# Don't run if this file is imported by another python script
 	main(sys.argv[1:])
