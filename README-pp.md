@@ -29,7 +29,7 @@ not matter.
 Run the following code:
 
 ~~~bash
-python export.py ${paypal_csv} ${export_folder}
+python donations-pp.py ${paypal_csv} ${export_folder}
 ~~~
 
 `${paypal_csv}` and `${export_folder}` are optional and default 

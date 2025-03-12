@@ -6,7 +6,7 @@ Fields order or their availability are not an issue with this script. But *this*
 
 To use this python script run:
 ~~~bash
-python export.py ${paypal_csv} ${export_folder}
+python donations-pp.py ${paypal_csv} ${export_folder}
 ~~~
 
 #Other info
