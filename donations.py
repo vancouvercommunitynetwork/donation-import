@@ -89,6 +89,7 @@ def export(fileName, outputFolder):
 	memberships = []
 
 	# Get the input normalized into a list before reading it into dictionary
+	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8)
 	normalized_input = normalizeInput(fileName)
 
 	reader = csv.DictReader(normalized_input)

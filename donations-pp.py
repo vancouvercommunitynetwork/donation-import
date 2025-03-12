@@ -14,6 +14,8 @@ python donations-pp.py ${paypal_csv} ${export_folder}
 - header line is needed for the importing PayPal csv file
 """
 
+from charset_normalizer import from_path
+
 import os
 import csv
 import sys
@@ -74,7 +76,7 @@ def export(fileName, outputFolder):
 	# open the export file as a text file of given encoding
 	# (and implicitly convert to utf-8 in python)
 	# tentatively use 'ansi' as it's also a commonly used ascii superset
-	with open(fileName, mode='r', encoding='ansi') as ppFile:
+	'''with open(fileName, mode='r', encoding='ansi') as ppFile:
 
 		# exctract file into a dictionary
 		reader = csv.DictReader(ppFile)
@@ -82,7 +84,18 @@ def export(fileName, outputFolder):
 			ind_contacts.append(fill_individual_contract(row))
 			ind_donations.append(fill_donation(row))
 			if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-				memberships.append(fill_membership(row))
+				memberships.append(fill_membership(row))'''
+
+	# Get the input normalized into a list before reading it into dictionary
+	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8)
+	normalized_input = normalizeInput(fileName)
+	
+	reader = csv.DictReader(normalized_input)
+	for row in reader:
+		ind_contacts.append(fill_individual_contract(row))
+		ind_donations.append(fill_donation(row))
+		if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+			memberships.append(fill_membership(row))
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
@@ -144,6 +157,19 @@ def fill_membership(row):
 	return membership
 
 # Other Helper Functions========================================================
+
+def normalizeInput(fileName):
+	""" Normalizes the encoding of the input to a standard encoding
+
+	Argument:
+		fileName -- (String) 	the csv file path
+	Return:			(List) 		the normalized input as a list
+	"""
+	charset_result = from_path(fileName).best()
+	normalized_input = str(charset_result)
+	normalized_list = normalized_input.splitlines()
+
+	return normalized_list
 
 def getField(row, field, default=""):
 	""" Gets the field
@@ -216,5 +242,5 @@ def main(argv):
 		print("Usage: python export.py ${paypal_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
-	# Don't run if this file is imported by another pythong script
+	# Don't run if this file is imported by another python script
 	main(sys.argv[1:])
