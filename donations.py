@@ -19,6 +19,8 @@ python donations.py ${canada_help_csv} ${export_folder}
 - header line is needed for the importing CanadaHelps csv file
 """
 
+from charset_normalizer import from_path
+
 import os
 import csv
 import sys
@@ -86,21 +88,23 @@ def export(fileName, outputFolder):
 	org_donations = []
 	memberships = []
 
-	with open(fileName, 'r', encoding='utf-16-le') as csvFile: # open export file
+	# Get the input normalized into a list before reading it into dictionary
+	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8)
+	normalized_input = normalizeInput(fileName)
 
-		# exctract file into a dictionary
-		reader = csv.DictReader(csvFile)
-		for row in reader:
-			if row[COMPANY_NAME] == '':
-				ind_contacts.append(fill_individual_contract(row))
-				ind_donations.append(fill_donation(row))
-			elif row[COMPANY_NAME].upper() == ANON:
-				ind_donations.append(fill_donation(row, ANON))
-			else:
-				org_contacts.append(fill_organization_contract(row))
-				org_donations.append(fill_donation(row))
-			if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-				memberships.append(fill_membership(row))
+	reader = csv.DictReader(normalized_input)
+	for row in reader:
+		if row[COMPANY_NAME] == '':
+			ind_contacts.append(fill_individual_contract(row))
+			ind_donations.append(fill_donation(row))
+		elif row[COMPANY_NAME].upper() == ANON:
+			ind_donations.append(fill_donation(row, ANON))
+		else:
+			org_contacts.append(fill_organization_contract(row))
+			org_donations.append(fill_donation(row))
+		if row[COMPANY_NAME].upper() != ANON and float(row[TOTAL_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+			memberships.append(fill_membership(row))
+
 
 	# output files
 	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
@@ -197,6 +201,19 @@ def fill_membership(row):
 
 # Other Helper Functions========================================================
 
+def normalizeInput(fileName):
+	""" Normalizes the encoding of the input to a standard encoding
+
+	Argument:
+		fileName -- (String) 	the csv file path
+	Return:			(List) 		the normalized input as a list
+	"""
+	charset_result = from_path(fileName).best()
+	normalized_input = str(charset_result)
+	normalized_list = normalized_input.splitlines()
+
+	return normalized_list
+
 def getField(row, field, default=""):
 	""" Gets the field
 
@@ -270,5 +287,5 @@ def main(argv):
 		print("Usage: python export.py ${canada_help_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
-	# Don't run if this file is imported by another pythong script
+	# Don't run if this file is imported by another python script
 	main(sys.argv[1:])
