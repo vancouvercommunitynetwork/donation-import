@@ -73,19 +73,6 @@ def export(fileName, outputFolder):
 	ind_donations = []
 	memberships = []
 
-	# open the export file as a text file of given encoding
-	# (and implicitly convert to utf-8 in python)
-	# tentatively use 'ansi' as it's also a commonly used ascii superset
-	'''with open(fileName, mode='r', encoding='ansi') as ppFile:
-
-		# exctract file into a dictionary
-		reader = csv.DictReader(ppFile)
-		for row in reader:
-			ind_contacts.append(fill_individual_contract(row))
-			ind_donations.append(fill_donation(row))
-			if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-				memberships.append(fill_membership(row))'''
-
 	# Get the input normalized into a list before reading it into dictionary
 	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8)
 	normalized_input = normalizeInput(fileName)
