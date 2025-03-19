@@ -14,7 +14,7 @@ python donations-pp.py ${paypal_csv} ${export_folder}
 - header line is needed for the importing PayPal csv file
 """
 
-from charset_normalizer import from_path
+from charset_normalizer import from_bytes
 
 import os
 import csv
@@ -73,21 +73,8 @@ def export(fileName, outputFolder):
 	ind_donations = []
 	memberships = []
 
-	# open the export file as a text file of given encoding
-	# (and implicitly convert to utf-8 in python)
-	# tentatively use 'ansi' as it's also a commonly used ascii superset
-	'''with open(fileName, mode='r', encoding='ansi') as ppFile:
-
-		# exctract file into a dictionary
-		reader = csv.DictReader(ppFile)
-		for row in reader:
-			ind_contacts.append(fill_individual_contract(row))
-			ind_donations.append(fill_donation(row))
-			if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
-				memberships.append(fill_membership(row))'''
-
 	# Get the input normalized into a list before reading it into dictionary
-	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8)
+	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8/ascii)
 	normalized_input = normalizeInput(fileName)
 	
 	reader = csv.DictReader(normalized_input)
@@ -165,8 +152,15 @@ def normalizeInput(fileName):
 		fileName -- (String) 	the csv file path
 	Return:			(List) 		the normalized input as a list
 	"""
-	charset_result = from_path(fileName).best()
-	normalized_input = str(charset_result)
+	with open(fileName, 'rb') as csvfile:
+		file_bytes = csvfile.read()
+
+	charset_result = from_bytes(file_bytes).best()
+	str_input = str(charset_result)
+	# explicitly encode as "utf-8"
+	enc_bytes = str.encode(str_input, "utf-8")
+	# turn encoded bytes into string
+	normalized_input = enc_bytes.decode("utf-8")
 	normalized_list = normalized_input.splitlines()
 
 	return normalized_list
