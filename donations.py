@@ -256,6 +256,8 @@ def convert_date(input_date_str):
 		input_date_str -- (String)     the date string from the input fileName
 	Return:               (String)     the date string to be used for the output file
 	"""
+	input_date = None
+
 	for input_format in INPUT_DATE_FORMATS:
 		try:
 			input_date = datetime.datetime.strptime(input_date_str, input_format)
@@ -264,7 +266,12 @@ def convert_date(input_date_str):
 		except ValueError:
 			# move on to the next format
 			pass
+	
+	# if the format did not match and is still None then raise the error
+	if input_date is None:
+		raise ValueError("Input date was not a valid date format")
 	output_date_str = input_date.strftime(OUTPUT_DATE_FORMAT)
+
 	return output_date_str
 
 # Main Functions================================================================
