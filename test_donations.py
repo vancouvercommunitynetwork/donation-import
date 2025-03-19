@@ -174,7 +174,11 @@ class TestDonations(unittest.TestCase):
         }
         expected = ["john.doe@example.com", "VCN Member", "2025-01-01"]
         self.assertEqual(fill_membership(row), expected)
-    
+
+    # Test the normalizeInput function
+    def test_normalizeInput_standard_encoding(self):
+        sample_csv = "Sample CanadaHelps Input CSV.csv" # original file encoding is utf-16-le
+        
 
 if __name__ == "__main__":
     unittest.main()

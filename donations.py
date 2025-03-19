@@ -19,7 +19,7 @@ python donations.py ${canada_help_csv} ${export_folder}
 - header line is needed for the importing CanadaHelps csv file
 """
 
-from charset_normalizer import from_path
+from charset_normalizer import from_bytes
 
 import os
 import csv
@@ -89,7 +89,7 @@ def export(fileName, outputFolder):
 	memberships = []
 
 	# Get the input normalized into a list before reading it into dictionary
-	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8)
+	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8/ascii)
 	normalized_input = normalizeInput(fileName)
 
 	reader = csv.DictReader(normalized_input)
@@ -208,8 +208,15 @@ def normalizeInput(fileName):
 		fileName -- (String) 	the csv file path
 	Return:			(List) 		the normalized input as a list
 	"""
-	charset_result = from_path(fileName).best()
-	normalized_input = str(charset_result)
+	with open(fileName, 'rb') as csvfile:
+		file_bytes = csvfile.read()
+
+	charset_result = from_bytes(file_bytes).best()
+	str_input = str(charset_result)
+	# explicitly encode as "utf-8"
+	enc_bytes = str.encode(str_input, "utf-8")
+	# turn encoded bytes into string
+	normalized_input = enc_bytes.decode("utf-8")
 	normalized_list = normalized_input.splitlines()
 
 	return normalized_list
@@ -284,7 +291,7 @@ def main(argv):
 	elif len(argv) == 0:
 		export("CharityDataDownload.csv", today_date_folder())
 	else:
-		print("Usage: python export.py ${canada_help_csv} ${export_folder} # to store 4 files.")
+		print("Usage: python donations.py ${canada_help_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
 	# Don't run if this file is imported by another python script
