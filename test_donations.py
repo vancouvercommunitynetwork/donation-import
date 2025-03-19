@@ -1,6 +1,5 @@
 import unittest
 import csv
-from charset_normalizer import detect
 
 from donations import (
     getField,
@@ -54,25 +53,18 @@ class TestDonations(unittest.TestCase):
         self.assertEqual(convert_date("2025/01/01"), "2025-01-01")
         self.assertEqual(convert_date("2025-01-01"), "2025-01-01")
     
-    # the following two tests should expect ValueError and not an UnboundLocalError
-    # need to fix exception handling and logic in donations.py later
-    # the two tests are failing un-intentionally, skipping for now
-    @unittest.skip("Skip un-intentended failing test")
+    # the following two tests should actually expect ValueError but gives UnboundLocalError instead
+    # will fix proper exception handling in donations.py later
+    @unittest.expectedFailure
     def test_convert_date_invalid_format(self):
         # Raise error for invalid format
         with self.assertRaises(ValueError):
             convert_date("01-01-2025")
     
-    @unittest.skip("Skip un-intentended failing test")
+    @unittest.expectedFailure
     def test_convert_date_empty_string(self):
         with self.assertRaises(ValueError):
             convert_date("")
-
-    def test_convert_date_unbound_error(self):
-        # testing for the unintended error
-        with self.assertRaises(UnboundLocalError):
-            convert_date("01-01-2025")
-            convert_date("") # empty string
 
     # Test the fill_individual_contract
     def test_fill_individual_contract(self):
@@ -177,8 +169,10 @@ class TestDonations(unittest.TestCase):
 
     # Test the normalizeInput function
     def test_normalizeInput_standard_encoding(self):
-        sample_csv = "Sample CanadaHelps Input CSV.csv" # original file encoding is utf-16-le
-        
+        sample_csv = "Sample CanadaHelps Input CSV.csv" # input file encoding is utf-16-le
+        normalized_input = normalizeInput(sample_csv)
+        norm_str = ''.join(normalized_input)
+        self.assertTrue(norm_str.isascii)        
 
 if __name__ == "__main__":
     unittest.main()
