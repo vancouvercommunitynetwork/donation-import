@@ -53,15 +53,10 @@ class TestDonations(unittest.TestCase):
         self.assertEqual(convert_date("2025/01/01"), "2025-01-01")
         self.assertEqual(convert_date("2025-01-01"), "2025-01-01")
     
-    # the following two tests should actually expect ValueError but gives UnboundLocalError instead
-    # will fix proper exception handling in donations.py later
-    @unittest.expectedFailure
     def test_convert_date_invalid_format(self):
-        # Raise error for invalid format
         with self.assertRaises(ValueError):
             convert_date("01-01-2025")
     
-    @unittest.expectedFailure
     def test_convert_date_empty_string(self):
         with self.assertRaises(ValueError):
             convert_date("")
