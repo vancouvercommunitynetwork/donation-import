@@ -133,6 +133,16 @@ mapping prefixed with "CanadaHelps".
 
 # History of Changes 
 
+Since March 18 2025
+- Added unit tests
+- Issues Fixed
+  - CSV input data not explicitly being encoded as UTF-8 after being read
+  - Incorrect error handling when converting date
+
+Since March 11 2025
+- Added support to allow different input CSV file encodings to be read
+   - Included sample CSVs with different formats
+
 Since Jun 13 2022
 - Added logic and documentation for membership CSV export
 
