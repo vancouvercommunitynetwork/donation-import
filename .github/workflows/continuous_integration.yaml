@@ -1,6 +1,6 @@
 name: continuous_integration
 
-on: [push]
+on: push
 
 jobs:
   build:
