@@ -35,4 +35,4 @@ jobs:
         - python-version: ${{ matrix.python-version }}
 
       - name: Run tests with unittest
-      - uses: python test_donations.py
+      - run: python test_donations.py
