@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
-        run: pip install charset-normalizer
+        run: python -m pip install charset-normalizer .
 
   test:
     runs-on: ubuntu-latest
