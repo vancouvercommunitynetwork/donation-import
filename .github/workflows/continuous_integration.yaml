@@ -1,8 +1,6 @@
 name: continuous_integration
 
-on:
-  push:
-  pull-request:
+on: push
 
 jobs:
   run-tests:
