@@ -236,7 +236,7 @@ def getField(row, field, default=""):
 			return default
 		return ans
 	else:
-		print ("Missing Field: \"" + field + "\". Exporting as \"" + default + "\".")
+		# print ("Missing Field: \"" + field + "\". Exporting as \"" + default + "\".")
 		# print (row)
 		return default
 
