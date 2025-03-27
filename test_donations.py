@@ -1,4 +1,6 @@
 import unittest
+import tempfile
+import os
 import csv
 
 from donations import (
@@ -9,6 +11,7 @@ from donations import (
     fill_donation,
     fill_membership,
     normalizeInput,
+    export,
 
     #importing constants to avoid duplication
     ANON,
@@ -50,8 +53,11 @@ class TestDonations(unittest.TestCase):
 
     # Test the convert_date function
     def test_convert_date_valid_format(self):
-        self.assertEqual(convert_date("2025/01/01"), "2025-01-01")
-        self.assertEqual(convert_date("2025-01-01"), "2025-01-01")
+        valid_dates = ["2025/01/01", "2025-01-01"]
+        expected_date = "2025-01-01"
+        for vd in valid_dates:
+            with self.subTest(vd):
+                self.assertEqual(convert_date(vd), expected_date)
     
     def test_convert_date_invalid_format(self):
         with self.assertRaises(ValueError):
@@ -86,6 +92,11 @@ class TestDonations(unittest.TestCase):
         expected = ["john.doe@example.com", "", "", "","","","","","","","john.doe@example.com"]
         self.assertEqual(fill_individual_contract(row), expected)
 
+    def test_fill_individual_contract_empty_row(self):
+        row = {}
+        expected = ["", "", "", "","","","","","","",""]
+        self.assertEqual(fill_individual_contract(row), expected)
+
     # Test the fill organizational contract function
     def test_fill_organizational_contract(self):
         row = {
@@ -109,6 +120,11 @@ class TestDonations(unittest.TestCase):
         }
         expected = ["john.doe@example.com", "", "","",
                     "","","","","","john.doe@example.com"]
+        self.assertEqual(fill_organization_contract(row), expected)
+
+    def test_fill_organizational_contract_empty_row(self):
+        row = {}
+        expected = ["","","","","","","","","",""]
         self.assertEqual(fill_organization_contract(row), expected)
 
     #Test the fill_donation function
@@ -175,8 +191,14 @@ class TestDonations(unittest.TestCase):
         expected = ["john.doe@example.com", "VCN Member", "2025-01-01"]
         self.assertEqual(fill_membership(row), expected)
 
+    def test_fill_membership_missing_fields(self):
+        # empty row expected to raise error since there is no valid date
+        row = {}
+        with self.assertRaises(ValueError):
+            fill_membership(row)
+
     # Test the normalizeInput function
-    def test_normalizeInput_standard_encoding(self):
+    def test_normalizeInput_to_standard_encoding(self):
         sample_csv = "Sample CanadaHelps Input CSV.csv" # input file encoding is utf-16-le
         normalized_input = normalizeInput(sample_csv)
         norm_str = ''.join(normalized_input)
