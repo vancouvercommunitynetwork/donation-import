@@ -1,4 +1,6 @@
 import unittest
+import tempfile
+import os
 import csv
 
 from donations import (
@@ -9,6 +11,7 @@ from donations import (
     fill_donation,
     fill_membership,
     normalizeInput,
+    export,
 
     #importing constants to avoid duplication
     ANON,
@@ -50,8 +53,11 @@ class TestDonations(unittest.TestCase):
 
     # Test the convert_date function
     def test_convert_date_valid_format(self):
-        self.assertEqual(convert_date("2025/01/01"), "2025-01-01")
-        self.assertEqual(convert_date("2025-01-01"), "2025-01-01")
+        valid_dates = ["2025/01/01", "2025-01-01"]
+        expected_date = "2025-01-01"
+        for vd in valid_dates:
+            with self.subTest(vd):
+                self.assertEqual(convert_date(vd), expected_date)
     
     def test_convert_date_invalid_format(self):
         with self.assertRaises(ValueError):
@@ -86,6 +92,11 @@ class TestDonations(unittest.TestCase):
         expected = ["john.doe@example.com", "", "", "","","","","","","","john.doe@example.com"]
         self.assertEqual(fill_individual_contract(row), expected)
 
+    def test_fill_individual_contract_empty_row(self):
+        row = {}
+        expected = ["", "", "", "","","","","","","",""]
+        self.assertEqual(fill_individual_contract(row), expected)
+
     # Test the fill organizational contract function
     def test_fill_organizational_contract(self):
         row = {
@@ -109,6 +120,11 @@ class TestDonations(unittest.TestCase):
         }
         expected = ["john.doe@example.com", "", "","",
                     "","","","","","john.doe@example.com"]
+        self.assertEqual(fill_organization_contract(row), expected)
+
+    def test_fill_organizational_contract_empty_row(self):
+        row = {}
+        expected = ["","","","","","","","","",""]
         self.assertEqual(fill_organization_contract(row), expected)
 
     #Test the fill_donation function
@@ -140,7 +156,8 @@ class TestDonations(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_fill_donation_missing_amount(self):
-        # Case where the donation amount might be missing, this test should fail
+        # Case where the donation amount might be missing, this test should fail since 
+        # the missing result does not resolve to a zero amount (0.00)
         row = {
             EMAIL: "john.doe@example.com",
             INVOICE_NUMBER: "123456789123",
@@ -153,6 +170,18 @@ class TestDonations(unittest.TestCase):
                     "CanadaHelps", "cheers", "Donation", "Credit Card"]
         self.assertEqual(fill_donation(row), expected)
 
+    def test_fill_donation_missing_amount_raises_error(self):
+        row = {
+            EMAIL: "john.doe@example.com",
+            INVOICE_NUMBER: "123456789123",
+            TOTAL_AMOUNT: "",
+            DATE_RECEIVED: "2025-01-01",
+            DONATION_SOURCE: "CanadaHelps",
+            NOTE: "cheers"
+        }
+        with self.assertRaises(ValueError):
+            fill_donation(row)
+
     # Test the fill membership function
     def test_fill_membership(self):
         row = {
@@ -162,12 +191,34 @@ class TestDonations(unittest.TestCase):
         expected = ["john.doe@example.com", "VCN Member", "2025-01-01"]
         self.assertEqual(fill_membership(row), expected)
 
+    def test_fill_membership_missing_fields(self):
+        # empty row expected to raise error since there is no valid date
+        row = {}
+        with self.assertRaises(ValueError):
+            fill_membership(row)
+
     # Test the normalizeInput function
-    def test_normalizeInput_standard_encoding(self):
+    def test_normalizeInput_to_standard_encoding(self):
         sample_csv = "Sample CanadaHelps Input CSV.csv" # input file encoding is utf-16-le
         normalized_input = normalizeInput(sample_csv)
         norm_str = ''.join(normalized_input)
-        self.assertTrue(norm_str.isascii)        
+        self.assertTrue(norm_str.isascii())      
+
+    def test_normalizeInput_different_input_encodings(self):
+        # test using the sample files with 5 different encodings
+        sample_dir = "sample_donations_canadahelps"
+        ansi_smp = sample_dir + "/sample_canadahelps_input_ansi.csv"
+        utf8BOM_smp = sample_dir + "/sample_canadahelps_input_utf_8_BOM.csv"
+        utf8_smp = sample_dir + "/sample_canadahelps_input_utf_8.csv"
+        utf16be_smp = sample_dir + "/sample_canadahelps_input_utf_16_be.csv"
+        utf16le_smp = sample_dir + "/sample_canadahelps_input_utf_16_le.csv"
+
+        sample_files = [ansi_smp, utf8BOM_smp, utf8_smp, utf16be_smp, utf16le_smp]
+        for sf in sample_files:
+            normalized_input = normalizeInput(sf)
+            norm_str = ''.join(normalized_input)
+            with self.subTest(sf):
+                self.assertTrue(norm_str.isascii())
 
 if __name__ == "__main__":
     unittest.main()
