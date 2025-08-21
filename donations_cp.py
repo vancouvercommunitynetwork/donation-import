@@ -228,7 +228,7 @@ def main(argv):
 	elif len(argv) == 0:
 		export("CharityDataDownload.csv", today_date_folder())
 	else:
-		print("Usage: python export.py ${paypal_csv} ${export_folder} # to store 4 files.")
+		print("Usage: python export.py ${connectionpoint_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
 	# Don't run if this file is imported by another python script
