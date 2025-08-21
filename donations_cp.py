@@ -6,7 +6,7 @@ Fields order or their availability are not an issue with this script. But *this*
 
 To use this python script run:
 ~~~bash
-python donations-cp.py ${connectionpoint_csv} ${export_folder}
+python donations_cp.py ${connectionpoint_csv} ${export_folder}
 ~~~
 
 #Other info
@@ -26,16 +26,11 @@ import datetime
 
 # TODO determine the actual fields in a connectionpoint export
 
-# PAYOUT_DATE="Payout Date"
 DONATION_DATE="Date"
 FIRST_NAME="Contributor name" #REQUIRED, need special handling
 LAST_NAME="Contributor name" #REQUIRED, need special handling
 EMAIL="Contributor email" #REQUIRED
-# PROGRAM_NAME="Program Name"
-# REFERENCE="Reference Information"
-# CURRENCY="Currency Code"
 GROSS_AMOUNT="Total amount" #REQUIRED
-# TOTAL_FEES="Total Fees"
 NET_AMOUNT="Net amount"
 TRANSACTION_ID="Transaction ID"
 
