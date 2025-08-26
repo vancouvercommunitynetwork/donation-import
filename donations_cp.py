@@ -26,15 +26,23 @@ import datetime
 
 # TODO determine the actual fields in a connectionpoint export
 
-DONATION_DATE="Date"
-FIRST_NAME="Contributor name" #REQUIRED, need special handling
-LAST_NAME="Contributor name" #REQUIRED, need special handling
-EMAIL="Contributor email" #REQUIRED
-GROSS_AMOUNT="Total amount" #REQUIRED
+DATE="Date"
+CONTRIBUTION_AMOUNT="Contribution amount" #REQUIRED
+TOTAL_AMOUNT="Total amount"
 NET_AMOUNT="Net amount"
+CURRENCY="Currency"
+PAYMENT_STATUS="Payment status"
 TRANSACTION_ID="Transaction ID"
+PROCESSED_BY="Processed by"
+CONTACT_EMAIL="Contact email" #REQUIRED
+FIRST_NAME="First name" #REQUIRED
+LAST_NAME="Last name" #REQUIRED
+MESSAGE="Message"
+SHOW_NAME="Show name"
+SHOW_AMOUNT="Show amount"
+SUBSCRIBE_TO_UPDATES="Subscribe to updates"
 
-EXTERNAL_ID="Contributor email" #REQUIRED
+EXTERNAL_ID="Contact email" #REQUIRED
 
 # Values used the export value
 FINANCIAL_TYPE = "Donation" #REQUIRED
@@ -76,7 +84,7 @@ def export(fileName, outputFolder):
 	for row in reader:
 		ind_contacts.append(fill_individual_contract(row))
 		ind_donations.append(fill_donation(row))
-		if float(row[GROSS_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+		if float(row[CONTRIBUTION_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
 			memberships.append(fill_membership(row))
 
 	# output files
@@ -96,10 +104,10 @@ def fill_individual_contract(row):
 	contact = []
 	contact.append(getField(row, EXTERNAL_ID))
 	# name
-	contact.append(getField(row, FIRST_NAME).split(None, maxsplit=1)[0])
-	contact.append(getField(row, LAST_NAME).rsplit(None, maxsplit=1)[-1])
+	contact.append(getField(row, FIRST_NAME))
+	contact.append(getField(row, LAST_NAME))
 	# email
-	contact.append(getField(row, EMAIL))
+	contact.append(getField(row, CONTACT_EMAIL))
 	return contact
 
 def fill_donation(row, external=""):
@@ -113,13 +121,14 @@ def fill_donation(row, external=""):
 	donation.append(getField(row, EXTERNAL_ID, external))
 	donation.append(getField(row, TRANSACTION_ID))
 	# amount - get number as string -> convert to float -> insert with format
-	amount_str = getField(row, GROSS_AMOUNT, '0')
+	amount_str = getField(row, CONTRIBUTION_AMOUNT, '0')
 	amount_float = float(amount_str)
 	donation.append("{:.2f}".format(amount_float))
 	# date - get date as string, try different formats
-	date = convert_date(getField(row, DONATION_DATE))
+	date = convert_date(getField(row, DATE))
 	donation.append(date)
 	# other exporting values
+	donation.append(getField(row, MESSAGE))
 	donation.append(FINANCIAL_TYPE)
 	donation.append(PAYMENT_METHOD)
 	return donation
@@ -134,7 +143,7 @@ def fill_membership(row):
 	membership = []
 	membership.append(getField(row, EXTERNAL_ID))
 	membership.append(MEMBERSHIP_TYPE)
-	date = convert_date(getField(row, DONATION_DATE))
+	date = convert_date(getField(row, DATE))
 	membership.append(date)
 	return membership
 

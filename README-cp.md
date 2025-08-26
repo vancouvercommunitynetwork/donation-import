@@ -4,16 +4,25 @@ This script requires Python 3.
 
 ## Input CSV file
 
-TODO: We need to find out what columns the file has, but it should at least have the following:
+The CSV file must have the following:
 
 |CP Field              |Required For                                                                                                                         |
 |----------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 |Date                  |[Donation Table](#donation-table)<br/>[Membership Table](#membership-table)                                                          |
-|Contributor name      |[Individual Contact Table](#individual-contact-table), need special handling for first/last names                                    |
-|Contributor email     |[Individual Contact Table](#individual-contact-table)<br/>[Donation Table](#donation-table)<br/>[Membership Table](#membership-table)|
-|Total amount          |[Donation Table](#donation-table)                                                                                                    |
+|Contribution amount   |[Donation Table](#donation-table)                                                                                                    |
+|Total amount          |                                                                                                                                     |
 |Net amount            |                                                                                                                                     |
+|Currency              |                                                                                                                                     |
+|Payment status        |                                                                                                                                     |
 |Transaction ID        |[Donation Table](#donation-table)                                                                                                    |
+|Processed by          |                                                                                                                                     |
+|Contact email         |[Individual Contact Table](#individual-contact-table)<br/>[Donation Table](#donation-table)<br/>[Membership Table](#membership-table)|
+|First name            |[Individual Contact Table](#individual-contact-table)                                                                                |
+|Last name             |[Individual Contact Table](#individual-contact-table)                                                                                |
+|Message               |[Donation Table](#donation-table)                                                                                                    |
+|Show name             |                                                                                                                                     |
+|Show amount           |                                                                                                                                     |
+|Subscribe to updates  |                                                                                                                                     |
 
 ## Steps
 
@@ -37,44 +46,45 @@ mapping prefixed with "ConnectionPoint".
 ## Output CSV files
 
 - ${export_folder}/individual_contacts.csv
-	- export for Import Contact with the mapping "PayPal Individuals",
+	- export for Import Contact with the mapping "FundRazr Individuals",
 	- fields follows [Individual Contact Table](#individual-contact-table)
 - ${export_folder}/individual_donations.csv
-	- export for Import Contact with the mapping "PayPal Individuals Donations"
+	- export for Import Contact with the mapping "FundRazr Individuals Donations"
 	- fields follows [Donation Table](#donation-table)
 - ${export_folder}/memberships.csv
-	- export for Import Memberships with the mapping "PayPal Donations"
+	- export for Import Memberships with the mapping "FundRazr Donations"
 	- fields follows [Membership Table](#membership-table)
 
 ### Individual Contact Table
 
-|CiviCRM Field         |CP Field               |Required                    |
-|----------------------|-----------------------|----------------------------|
-|EXTERNAL_ID           |Contributor email      |**YES**                     |
-|FIRST_NAME            |Contributor name       |**YES**, extract first name |
-|LAST_NAME             |Contributor name       |**YES**, extract last name  |
-|EMAIL                 |Contributor email      |**YES**                     |
+|CiviCRM Field         |CP Field      |Required|
+|----------------------|--------------|--------|
+|EXTERNAL_ID           |Contact email |**YES** |
+|FIRST_NAME            |First name    |**YES** |
+|LAST_NAME             |Last name     |**YES** |
+|EMAIL                 |Contact email |**YES** |
 
 
 ### Donation Table
 
-|CiviCRM Field  |CP Field          |Required/Value    |
-|---------------|------------------|------------------|
-|EXTERNAL_ID    |Contributor email |**YES**           |
-|INVOICE_NUMBER |Transaction ID    |No                |
-|TOTAL_AMOUNT   |Total amount      |**YES**           |
-|DATE_RECEIVED  |Date              |No                |
-|FINANCIAL_TYPE |*n/a*             |`Donation`        |
-|PAYMENT_METHOD |*n/a*             |`ConnectionPoint` |
+|CiviCRM Field  |CP Field            |Required/Value    |
+|---------------|--------------------|------------------|
+|EXTERNAL_ID    |Contact email       |**YES**           |
+|INVOICE_NUMBER |Transaction ID      |No                |
+|TOTAL_AMOUNT   |Contribution amount |**YES**           |
+|DATE_RECEIVED  |Date                |No                |
+|NOTE           |Message             |No                |
+|FINANCIAL_TYPE |*n/a*               |`Donation`        |
+|PAYMENT_METHOD |*n/a*               |`ConnectionPoint` |
 
 
 ### Membership Table
 
-|CiviCRM Field        |CP Field          |Required/Value|
-|---------------------|------------------|--------------|
-|EXTERNAL_ID          |Contributor email |**YES**       |
-|MEMBERSHIP_TYPE      |*n/a*             |`VCN Member`  |
-|MEMBERSHIP_START_DATE|Date              |No            |
+|CiviCRM Field         |CP Field          |Required/Value|
+|----------------------|------------------|--------------|
+|EXTERNAL_ID           |Contact email     |**YES**       |
+|MEMBERSHIP_TYPE       |*n/a*             |`VCN Member`  |
+|MEMBERSHIP_START_DATE |Date              |No            |
 
 ## Notes
 
