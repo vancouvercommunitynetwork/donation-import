@@ -1,12 +1,12 @@
 #!/usr/bin/python
-""" Create a CSV to import into CiviCRM from ConnectionPoint output CSV.
+""" Create a CSV to import into CiviCRM from FundRazr output CSV.
 
 Fields order or their availability are not an issue with this script. But *this*
 *does not mean resulting csv file will import into CiviCRM successfully*.
 
 To use this python script run:
 ~~~bash
-python donations_cp.py ${connectionpoint_csv} ${export_folder}
+python donations_fr.py ${fundrazr_csv} ${export_folder}
 ~~~
 
 #Other info
@@ -23,8 +23,6 @@ import datetime
 
 # Fields to export==============================================================
 # Variable names are the name that the fields should import into
-
-# TODO determine the actual fields in a connectionpoint export
 
 DATE="Date"
 CONTRIBUTION_AMOUNT="Contribution amount" #REQUIRED
@@ -46,7 +44,7 @@ EXTERNAL_ID="Contact email" #REQUIRED
 
 # Values used the export value
 FINANCIAL_TYPE = "Donation" #REQUIRED
-PAYMENT_METHOD = "ConnectionPoint"
+PAYMENT_METHOD = "FundRazr"
 MEMBERSHIP_TYPE = "VCN Member"
 
 # Constants used in this file===================================================
@@ -237,7 +235,7 @@ def main(argv):
 	elif len(argv) == 0:
 		export("CharityDataDownload.csv", today_date_folder())
 	else:
-		print("Usage: python export.py ${connectionpoint_csv} ${export_folder} # to store 4 files.")
+		print("Usage: python export.py ${fundrazr_csv} ${export_folder} # to store 4 files.")
 
 if __name__ == '__main__':
 	# Don't run if this file is imported by another python script

@@ -1,4 +1,4 @@
-# Donation Import from ConnectionPoint
+# Donation Import from FundRazr
 
 This script requires Python 3.
 
@@ -6,7 +6,7 @@ This script requires Python 3.
 
 The CSV file must have the following:
 
-|CP Field              |Required For                                                                                                                         |
+|FR Field              |Required For                                                                                                                         |
 |----------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 |Date                  |[Donation Table](#donation-table)<br/>[Membership Table](#membership-table)                                                          |
 |Contribution amount   |[Donation Table](#donation-table)                                                                                                    |
@@ -26,21 +26,21 @@ The CSV file must have the following:
 
 ## Steps
 
-Export csv from ConnectionPoint. Keep the headings, and the column order does
+Export csv from FundRazr. Keep the headings, and the column order does
 not matter.
 
 Run the following code:
 
 ~~~bash
-python donations_cp.py ${cp_csv} ${export_folder}
+python donations_fr.py ${fr_csv} ${export_folder}
 ~~~
 
-`${cp_csv}` and `${export_folder}` are optional and default 
+`${fr_csv}` and `${export_folder}` are optional and default 
 to `CharityDataDownload.csv` and today's day (with the format YYYY-MM-DD) 
 respectively. The `${export_folder}` folder will be created as needed.
 
 Import contacts into CiviCRM before importing donations. Please use the
-mapping prefixed with "ConnectionPoint".
+mapping prefixed with "FundRazr".
 
 
 ## Output CSV files
@@ -57,7 +57,7 @@ mapping prefixed with "ConnectionPoint".
 
 ### Individual Contact Table
 
-|CiviCRM Field         |CP Field      |Required|
+|CiviCRM Field         |FR Field      |Required|
 |----------------------|--------------|--------|
 |EXTERNAL_ID           |Contact email |**YES** |
 |FIRST_NAME            |First name    |**YES** |
@@ -67,7 +67,7 @@ mapping prefixed with "ConnectionPoint".
 
 ### Donation Table
 
-|CiviCRM Field  |CP Field            |Required/Value    |
+|CiviCRM Field  |FR Field            |Required/Value    |
 |---------------|--------------------|------------------|
 |EXTERNAL_ID    |Contact email       |**YES**           |
 |INVOICE_NUMBER |Transaction ID      |No                |
@@ -75,12 +75,12 @@ mapping prefixed with "ConnectionPoint".
 |DATE_RECEIVED  |Date                |No                |
 |NOTE           |Message             |No                |
 |FINANCIAL_TYPE |*n/a*               |`Donation`        |
-|PAYMENT_METHOD |*n/a*               |`ConnectionPoint` |
+|PAYMENT_METHOD |*n/a*               |`FundRazr`        |
 
 
 ### Membership Table
 
-|CiviCRM Field         |CP Field          |Required/Value|
+|CiviCRM Field         |FR Field          |Required/Value|
 |----------------------|------------------|--------------|
 |EXTERNAL_ID           |Contact email     |**YES**       |
 |MEMBERSHIP_TYPE       |*n/a*             |`VCN Member`  |
@@ -89,4 +89,4 @@ mapping prefixed with "ConnectionPoint".
 ## Notes
 
 - TODO: determine the date format
-- header line is needed for the importing CP csv file
+- header line is needed for the importing FR csv file
