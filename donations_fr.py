@@ -10,7 +10,6 @@ python donations_fr.py ${fundrazr_csv} ${export_folder}
 ~~~
 
 #Other info
-- TODO check date format
 - header line is needed for the importing csv file
 """
 
@@ -54,7 +53,8 @@ MEMBERSHIP_FILE = "/memberships.csv"
 
 MEMBERSHIP_MIN_AMOUNT = 15
 
-INPUT_DATE_FORMATS = ['%Y/%m/%d', '%Y-%m-%d']
+# - TODO placeholder date format; the input also includes time of some also-unknown format
+INPUT_DATE_FORMATS = ['%Y/%m/%d %H:%M', '%Y-%m-%d %H:%M']
 OUTPUT_DATE_FORMAT = '%Y-%m-%d'
 
 # Main export function==========================================================
