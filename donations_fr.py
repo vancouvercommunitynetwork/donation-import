@@ -1,0 +1,242 @@
+#!/usr/bin/python
+""" Create a CSV to import into CiviCRM from FundRazr output CSV.
+
+Fields order or their availability are not an issue with this script. But *this*
+*does not mean resulting csv file will import into CiviCRM successfully*.
+
+To use this python script run:
+~~~bash
+python donations_fr.py ${fundrazr_csv} ${export_folder}
+~~~
+
+#Other info
+- header line is needed for the importing csv file
+"""
+
+from charset_normalizer import from_bytes
+
+import os
+import csv
+import sys
+import datetime
+
+# Fields to export==============================================================
+# Variable names are the name that the fields should import into
+
+DATE="Date"
+CONTRIBUTION_AMOUNT="Contribution amount" #REQUIRED
+TOTAL_AMOUNT="Total amount"
+NET_AMOUNT="Net amount"
+CURRENCY="Currency"
+PAYMENT_STATUS="Payment status"
+TRANSACTION_ID="Transaction ID"
+PROCESSED_BY="Processed by"
+CONTACT_EMAIL="Contact email" #REQUIRED
+FIRST_NAME="First name" #REQUIRED
+LAST_NAME="Last name" #REQUIRED
+MESSAGE="Message"
+SHOW_NAME="Show name"
+SHOW_AMOUNT="Show amount"
+SUBSCRIBE_TO_UPDATES="Subscribe to updates"
+
+EXTERNAL_ID="Contact email" #REQUIRED
+
+# Values used the export value
+FINANCIAL_TYPE = "Donation" #REQUIRED
+PAYMENT_METHOD = "FundRazr"
+MEMBERSHIP_TYPE = "VCN Member"
+
+# Constants used in this file===================================================
+IND_CONTACT_FILE = "/individual_contacts.csv"
+IND_DONATION_FILE = "/individual_donations.csv"
+MEMBERSHIP_FILE = "/memberships.csv"
+
+MEMBERSHIP_MIN_AMOUNT = 15
+
+# - TODO placeholder date format; the input also includes time of some also-unknown format
+INPUT_DATE_FORMATS = ['%Y/%m/%d %H:%M', '%Y-%m-%d %H:%M']
+OUTPUT_DATE_FORMAT = '%Y-%m-%d'
+
+# Main export function==========================================================
+
+def export(fileName, outputFolder):
+	""" Export the four files
+
+	Arugment:
+		fileName     -- (String) the input csv file path
+		outputFolder -- (String) the output folder path
+	"""
+	if not(os.path.exists(outputFolder)):
+		os.makedirs(outputFolder)
+
+	# output list
+	ind_contacts = []
+	ind_donations = []
+	memberships = []
+
+	# Get the input normalized into a list before reading it into dictionary
+	# As the encoding of the input CSV may be different it needs to be normalized to a standard encoding (utf-8/ascii)
+	normalized_input = normalizeInput(fileName)
+	
+	reader = csv.DictReader(normalized_input)
+	for row in reader:
+		ind_contacts.append(fill_individual_contract(row))
+		ind_donations.append(fill_donation(row))
+		if float(row[CONTRIBUTION_AMOUNT]) >= MEMBERSHIP_MIN_AMOUNT:
+			memberships.append(fill_membership(row))
+
+	# output files
+	output_file(outputFolder + IND_CONTACT_FILE, ind_contacts)
+	output_file(outputFolder + IND_DONATION_FILE, ind_donations)
+	output_file(outputFolder + MEMBERSHIP_FILE, memberships)
+
+# Array filling functions ======================================================
+
+def fill_individual_contract(row):
+	""" Create a csv row for individual contact.
+
+	Argument:
+		row -- (Dictionary) the row extract data from
+	Return:    (Array)      a line for the csv file
+	"""
+	contact = []
+	contact.append(getField(row, EXTERNAL_ID))
+	# name
+	contact.append(getField(row, FIRST_NAME))
+	contact.append(getField(row, LAST_NAME))
+	# email
+	contact.append(getField(row, CONTACT_EMAIL))
+	return contact
+
+def fill_donation(row, external=""):
+	""" Create a csv row for donation.
+
+	Argument:
+		row -- (Dictionary) the row extract data from
+	Return:    (Array)      a line for the csv file
+	"""
+	donation = []
+	donation.append(getField(row, EXTERNAL_ID, external))
+	donation.append(getField(row, TRANSACTION_ID))
+	# amount - get number as string -> convert to float -> insert with format
+	amount_str = getField(row, CONTRIBUTION_AMOUNT, '0')
+	amount_float = float(amount_str)
+	donation.append("{:.2f}".format(amount_float))
+	# date - get date as string, try different formats
+	date = convert_date(getField(row, DATE))
+	donation.append(date)
+	# other exporting values
+	donation.append(getField(row, MESSAGE))
+	donation.append(FINANCIAL_TYPE)
+	donation.append(PAYMENT_METHOD)
+	return donation
+
+def fill_membership(row):
+	""" Create a csv row for membership.
+
+	Argument:
+		row -- (Dictionary) the row extract data from
+	Return:    (Array)      a line for the csv file
+	"""
+	membership = []
+	membership.append(getField(row, EXTERNAL_ID))
+	membership.append(MEMBERSHIP_TYPE)
+	date = convert_date(getField(row, DATE))
+	membership.append(date)
+	return membership
+
+# Other Helper Functions========================================================
+
+def normalizeInput(fileName):
+	""" Normalizes the encoding of the input to a standard encoding
+
+	Argument:
+		fileName -- (String) 	the csv file path
+	Return:			(List) 		the normalized input as a list
+	"""
+	with open(fileName, 'rb') as csvfile:
+		file_bytes = csvfile.read()
+
+	charset_result = from_bytes(file_bytes).best()
+	str_input = str(charset_result)
+	# explicitly encode as "utf-8"
+	enc_bytes = str.encode(str_input, "utf-8")
+	# turn encoded bytes into string
+	normalized_input = enc_bytes.decode("utf-8")
+	normalized_list = normalized_input.splitlines()
+
+	return normalized_list
+
+def getField(row, field, default=""):
+	""" Gets the field
+
+	Argument:
+		row     -- (Dictionary) the row extract data from
+		field   -- (String)     the field name
+		default -- (String)     the default value
+	Return:        (String)     the value from the `row` dictionary
+	"""
+	if field in row:
+		return row[field]
+	else:
+		print ("Missing Field: \"" + field + "\". Exporting as \"" + default + "\".")
+		# print (row)
+		return default
+
+def output_file(fileName, items):
+	""" Output a csv file
+
+	Argument:
+		fileName -- (String) the csv file path
+		items    -- (List)   list of items to export
+	"""
+	# open the file for writing as text file
+	with open(fileName, 'w', encoding='utf-8') as csvFile:
+		output = csv.writer(csvFile)
+		for item in items:
+			output.writerow(item)
+
+def today_date_folder():
+	today = datetime.date.today()
+	return today.strftime("%Y-%m-%d")
+
+def convert_date(input_date_str):
+	""" Convert a date string from the input file into a date string for the output file
+
+	Argument:
+		input_date_str -- (String)     the date string from the input fileName
+	Return:               (String)     the date string to be used for the output file
+	"""
+	for input_format in INPUT_DATE_FORMATS:
+		try:
+			input_date = datetime.datetime.strptime(input_date_str, input_format)
+			# stop if the format matched
+			break
+		except ValueError:
+			# move on to the next format
+			pass
+	output_date_str = input_date.strftime(OUTPUT_DATE_FORMAT)
+	return output_date_str
+
+# Main Functions================================================================
+
+def main(argv):
+	""" The main method of this script
+
+	This method will be called if this script is called from terminal
+
+	Argument:
+		argv -- program arguments
+	"""
+	if len(argv) == 2:
+		export(argv[0], argv[1])
+	elif len(argv) == 1:
+		export(argv[0], today_date_folder())
+	elif len(argv) == 0:
+		export("CharityDataDownload.csv", today_date_folder())
+	else:
+		print("Usage: python export.py ${fundrazr_csv} ${export_folder} # to store 4 files.")
+
+if __name__ == '__main__':
+	# Don't run if this file is imported by another python script
+	main(sys.argv[1:])
